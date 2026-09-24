@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "docker-compose.yml": {
-    "mtime": 1789972605.234799,
-    "seen": 1790225235.779834,
-    "ast_hash": "5ed3909b3ebf14fcc4287b56c9ddf07e",
+    "mtime": 1790225448.0011773,
+    "seen": 1790225593.116574,
+    "ast_hash": "921eb91645ef68b7e5f49030caa2e4ae",
     "semantic_hash": ""
   },
   "docs/AEGIS_Arquitectura_Tecnica.md": {
@@ -449,24 +449,6 @@
     "ast_hash": "1d8cc319306a7e68346378de22d4b20a",
     "semantic_hash": ""
   },
-  "backend/branding/README.md": {
-    "mtime": 1790225448.0869534,
-    "seen": 1790225527.055129,
-    "ast_hash": "05b355c6d8b93d14f5c3e8546c8e4580",
-    "semantic_hash": ""
-  },
-  "backend/docker-compose.yml": {
-    "mtime": 1790225448.0011773,
-    "seen": 1790225527.05513,
-    "ast_hash": "921eb91645ef68b7e5f49030caa2e4ae",
-    "semantic_hash": ""
-  },
-  "backend/infra/postgres/README.md": {
-    "mtime": 1790225448.0049615,
-    "seen": 1790225527.05513,
-    "ast_hash": "b86b6b23564fad60aa84eb95d774e051",
-    "semantic_hash": ""
-  },
   "backend/requirements.txt": {
     "mtime": 1788857488.0,
     "seen": 1790225527.05513,
@@ -479,15 +461,27 @@
     "ast_hash": "b54623f82ffe9d49a58ac193848ee9ab",
     "semantic_hash": ""
   },
-  "backend/branding/alkalma-logo-placeholder.svg": {
+  "branding/README.md": {
+    "mtime": 1790225448.0869534,
+    "seen": 1790225593.116574,
+    "ast_hash": "05b355c6d8b93d14f5c3e8546c8e4580",
+    "semantic_hash": ""
+  },
+  "infra/postgres/README.md": {
+    "mtime": 1790225448.0049615,
+    "seen": 1790225593.1166432,
+    "ast_hash": "b86b6b23564fad60aa84eb95d774e051",
+    "semantic_hash": ""
+  },
+  "branding/alkalma-logo-placeholder.svg": {
     "mtime": 1790225448.0823805,
-    "seen": 1790225527.05522,
+    "seen": 1790225593.1166441,
     "ast_hash": "277e58eae4c6edf959d93dabf97d89e8",
     "semantic_hash": ""
   },
-  "backend/frontend/public/branding/alkalma-logo-placeholder.svg": {
+  "frontend/public/branding/alkalma-logo-placeholder.svg": {
     "mtime": 1790225448.0851188,
-    "seen": 1790225527.05522,
+    "seen": 1790225593.116645,
     "ast_hash": "277e58eae4c6edf959d93dabf97d89e8",
     "semantic_hash": ""
   }

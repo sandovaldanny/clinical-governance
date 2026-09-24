@@ -3366,7 +3366,7 @@
       "source_location": "L499"
     },
     {
-      "id": "backend_branding_readme",
+      "id": "branding_readme",
       "label": "branding/README.md",
       "_origin": "ast",
       "community": 18,
@@ -3374,11 +3374,11 @@
       "file_type": "document",
       "node_kind": "page",
       "norm_label": "branding/readme.md",
-      "source_file": "backend/branding/README.md",
+      "source_file": "branding/README.md",
       "source_location": "L1"
     },
     {
-      "id": "backend_branding_readme_branding_identidad_alkalma_health",
+      "id": "branding_readme_branding_identidad_alkalma_health",
       "label": "branding \u2014 identidad Alkalma Health",
       "_origin": "ast",
       "community": 18,
@@ -3386,11 +3386,11 @@
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "branding \u2014 identidad alkalma health",
-      "source_file": "backend/branding/README.md",
+      "source_file": "branding/README.md",
       "source_location": "L1"
     },
     {
-      "id": "backend_branding_readme_d\u00f3nde_vive_cada_cosa",
+      "id": "branding_readme_d\u00f3nde_vive_cada_cosa",
       "label": "D\u00f3nde vive cada cosa",
       "_origin": "ast",
       "community": 18,
@@ -3398,11 +3398,11 @@
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "donde vive cada cosa",
-      "source_file": "backend/branding/README.md",
+      "source_file": "branding/README.md",
       "source_location": "L6"
     },
     {
-      "id": "backend_branding_readme_insumos_pendientes_secci\u00f3n_5_2_del_funcional",
+      "id": "branding_readme_insumos_pendientes_secci\u00f3n_5_2_del_funcional",
       "label": "Insumos pendientes (secci\u00f3n 5.2 del funcional)",
       "_origin": "ast",
       "community": 18,
@@ -3410,11 +3410,11 @@
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "insumos pendientes (seccion 5.2 del funcional)",
-      "source_file": "backend/branding/README.md",
+      "source_file": "branding/README.md",
       "source_location": "L30"
     },
     {
-      "id": "backend_branding_readme_tokens_vigentes_placeholder",
+      "id": "branding_readme_tokens_vigentes_placeholder",
       "label": "Tokens vigentes (placeholder)",
       "_origin": "ast",
       "community": 18,
@@ -3422,7 +3422,7 @@
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "tokens vigentes (placeholder)",
-      "source_file": "backend/branding/README.md",
+      "source_file": "branding/README.md",
       "source_location": "L14"
     },
     {
@@ -3924,7 +3924,7 @@
       "source_location": "L465"
     },
     {
-      "id": "backend_infra_postgres_readme",
+      "id": "infra_postgres_readme",
       "label": "postgres/README.md",
       "_origin": "ast",
       "community": 22,
@@ -3932,11 +3932,11 @@
       "file_type": "document",
       "node_kind": "page",
       "norm_label": "postgres/readme.md",
-      "source_file": "backend/infra/postgres/README.md",
+      "source_file": "infra/postgres/README.md",
       "source_location": "L1"
     },
     {
-      "id": "backend_infra_postgres_readme_infra_postgres",
+      "id": "infra_postgres_readme_infra_postgres",
       "label": "infra/postgres",
       "_origin": "ast",
       "community": 22,
@@ -3944,11 +3944,11 @@
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "infra/postgres",
-      "source_file": "backend/infra/postgres/README.md",
+      "source_file": "infra/postgres/README.md",
       "source_location": "L1"
     },
     {
-      "id": "backend_infra_postgres_readme_uso_del_rol_restringido",
+      "id": "infra_postgres_readme_uso_del_rol_restringido",
       "label": "Uso del rol restringido",
       "_origin": "ast",
       "community": 22,
@@ -3956,7 +3956,7 @@
       "file_type": "document",
       "node_kind": "heading",
       "norm_label": "uso del rol restringido",
-      "source_file": "backend/infra/postgres/README.md",
+      "source_file": "infra/postgres/README.md",
       "source_location": "L10"
     },
     {
@@ -4368,17 +4368,6 @@
       "norm_label": "react",
       "source_file": "frontend/package.json",
       "source_location": "L12"
-    },
-    {
-      "id": "ref_react_dom",
-      "label": "react-dom",
-      "_origin": "ast",
-      "community": 3,
-      "community_name": "App.tsx",
-      "file_type": "concept",
-      "norm_label": "react-dom",
-      "source_file": "frontend/package.json",
-      "source_location": "L13"
     },
     {
       "id": "ref_react_router_dom",
@@ -5158,6 +5147,17 @@
       "source_location": "L1"
     },
     {
+      "id": "ref_react_dom",
+      "label": "react-dom",
+      "_origin": "ast",
+      "community": 6,
+      "community_name": "package.json",
+      "file_type": "concept",
+      "norm_label": "react-dom",
+      "source_file": "frontend/package.json",
+      "source_location": "L13"
+    },
+    {
       "id": "ref_types_react",
       "label": "@types/react",
       "_origin": "ast",
@@ -5728,18 +5728,6 @@
       "source_location": "L452"
     },
     {
-      "id": "sqlalchemy",
-      "label": "sqlalchemy",
-      "_origin": "semantic",
-      "community": 0,
-      "community_name": "seed_demo_data.py",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "sqlalchemy",
-      "source_file": "",
-      "type": "external"
-    },
-    {
       "id": "apscheduler_schedulers_background",
       "label": "apscheduler_schedulers_background",
       "_origin": "semantic",
@@ -5788,6 +5776,18 @@
       "type": "external"
     },
     {
+      "id": "pytest",
+      "label": "pytest",
+      "_origin": "semantic",
+      "community": 15,
+      "community_name": "test_ucca_cycles.py",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "pytest",
+      "source_file": "",
+      "type": "external"
+    },
+    {
       "id": "alembic",
       "label": "alembic",
       "_origin": "semantic",
@@ -5832,6 +5832,18 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "collections_abc",
+      "source_file": "",
+      "type": "external"
+    },
+    {
+      "id": "datetime",
+      "label": "datetime",
+      "_origin": "semantic",
+      "community": 2,
+      "community_name": "deps.py",
+      "external": true,
+      "file_type": "concept",
+      "norm_label": "datetime",
       "source_file": "",
       "type": "external"
     },
@@ -5944,14 +5956,14 @@
       "type": "external"
     },
     {
-      "id": "datetime",
-      "label": "datetime",
+      "id": "sqlalchemy",
+      "label": "sqlalchemy",
       "_origin": "semantic",
       "community": 4,
       "community_name": "ucca/service.py",
       "external": true,
       "file_type": "concept",
-      "norm_label": "datetime",
+      "norm_label": "sqlalchemy",
       "source_file": "",
       "type": "external"
     },
@@ -5964,18 +5976,6 @@
       "external": true,
       "file_type": "concept",
       "norm_label": "dataclasses",
-      "source_file": "",
-      "type": "external"
-    },
-    {
-      "id": "pytest",
-      "label": "pytest",
-      "_origin": "semantic",
-      "community": 8,
-      "community_name": "engine.py",
-      "external": true,
-      "file_type": "concept",
-      "norm_label": "pytest",
       "source_file": "",
       "type": "external"
     },
@@ -13949,72 +13949,6 @@
       "weight": 1.0
     },
     {
-      "source": "backend_branding_readme",
-      "target": "backend_branding_readme_branding_identidad_alkalma_health",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/branding/README.md",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_branding_readme_branding_identidad_alkalma_health",
-      "target": "backend_branding_readme_tokens_vigentes_placeholder",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/branding/README.md",
-      "source_location": "L14",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_branding_readme_branding_identidad_alkalma_health",
-      "target": "backend_branding_readme_insumos_pendientes_secci\u00f3n_5_2_del_funcional",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/branding/README.md",
-      "source_location": "L30",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_branding_readme_branding_identidad_alkalma_health",
-      "target": "backend_branding_readme_d\u00f3nde_vive_cada_cosa",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/branding/README.md",
-      "source_location": "L6",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_infra_postgres_readme",
-      "target": "backend_infra_postgres_readme_infra_postgres",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/infra/postgres/README.md",
-      "source_location": "L1",
-      "weight": 1.0
-    },
-    {
-      "source": "backend_infra_postgres_readme_infra_postgres",
-      "target": "backend_infra_postgres_readme_uso_del_rol_restringido",
-      "relation": "contains",
-      "_origin": "ast",
-      "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
-      "source_file": "backend/infra/postgres/README.md",
-      "source_location": "L10",
-      "weight": 1.0
-    },
-    {
       "source": "backend_tests_conftest",
       "target": "backend_tests_conftest_rule_context_factory",
       "relation": "contains",
@@ -14122,6 +14056,50 @@
       "confidence_score": 1.0,
       "source_file": "backend/tests/test_ucca_cycles.py",
       "source_location": "L48",
+      "weight": 1.0
+    },
+    {
+      "source": "branding_readme",
+      "target": "branding_readme_branding_identidad_alkalma_health",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "branding/README.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "branding_readme_branding_identidad_alkalma_health",
+      "target": "branding_readme_tokens_vigentes_placeholder",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "branding/README.md",
+      "source_location": "L14",
+      "weight": 1.0
+    },
+    {
+      "source": "branding_readme_branding_identidad_alkalma_health",
+      "target": "branding_readme_insumos_pendientes_secci\u00f3n_5_2_del_funcional",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "branding/README.md",
+      "source_location": "L30",
+      "weight": 1.0
+    },
+    {
+      "source": "branding_readme_branding_identidad_alkalma_health",
+      "target": "branding_readme_d\u00f3nde_vive_cada_cosa",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "branding/README.md",
+      "source_location": "L6",
       "weight": 1.0
     },
     {
@@ -16157,6 +16135,28 @@
       "confidence_score": 1.0,
       "source_file": "frontend/tsconfig.json",
       "source_location": "L9",
+      "weight": 1.0
+    },
+    {
+      "source": "infra_postgres_readme",
+      "target": "infra_postgres_readme_infra_postgres",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "infra/postgres/README.md",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "infra_postgres_readme_infra_postgres",
+      "target": "infra_postgres_readme_uso_del_rol_restringido",
+      "relation": "contains",
+      "_origin": "ast",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "infra/postgres/README.md",
+      "source_location": "L10",
       "weight": 1.0
     },
     {

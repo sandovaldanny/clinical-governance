@@ -120,6 +120,22 @@ VITE_AUTH_DISABLED=true
 Reinicie ambos procesos (Vite lee `.env` solo al arrancar). El backend actúa como el System Administrator
 del seed y la UI muestra una franja de advertencia. **Nunca** habilitar en staging o producción.
 
+## Módulo administrativo (M01/M02)
+
+Implementa el documento `docs/AEGIS_M01_User_Organization_Access.md`. Cada tabla admin permite
+registrar, editar y activar/inactivar, siempre auditado en `audit_events`:
+
+| Pantalla | Endpoints | Notas |
+|---|---|---|
+| Usuarios | `GET/POST /identity/users`, `PATCH /identity/users/{id}`, `PATCH …/{id}/status` | Flujo identidad → cargo → centros → profesión → roles. Contraseña temporal generada por el sistema, mostrada una sola vez, cambio forzado en el primer login. Estados `active / inactive / suspended`; las cuentas nunca se borran. |
+| Cargos | `GET/POST /identity/positions`, `PATCH …/{id}` | No determinan permisos. |
+| Centros | `GET/POST /identity/facilities`, `PATCH …/{id}` | País/ciudad desde catálogos, director clínico (lookup de usuarios), estado `active / closed`. |
+| Profesiones | `GET/POST /identity/professions`, `PATCH …/{id}` | — |
+| Especialidades | `GET/POST /identity/catalogs`, `PATCH …/{id}` | Catálogo genérico (`catalog_type=specialty`). |
+| Roles | `GET /identity/permissions`, `GET/POST /identity/roles`, `PATCH …/{id}` | Matriz rol→permiso editable por módulo; System Administrator conserva todos los permisos. Los permisos viajan en el JWT y aplican en el siguiente inicio de sesión. |
+
+Permisos que gobiernan la escritura: `users.manage`, `catalogs.manage`, `facilities.manage`, `roles.manage`.
+
 ## Cómo se agrega un módulo nuevo
 
 1. Crear `backend/app/domains/<grupo>/<modulo>/{models,schemas,service,router}.py` usando `ucca/` como plantilla.

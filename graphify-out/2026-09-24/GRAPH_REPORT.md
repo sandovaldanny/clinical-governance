@@ -1,9 +1,9 @@
 # Graph Report - clinical-governance  (2026-09-24)
 
 ## Corpus Check
-- 77 files · ~24,480 words
+- 77 files · ~24,427 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 9 file(s) not represented in the graph (top: .example 4, (none) 3, .ini 1)
+- Unclassified: 8 file(s) not represented in the graph (top: .example 3, (none) 3, .ini 1)
 
 ## Summary
 - 508 nodes · 1036 edges · 34 communities (23 shown, 11 thin omitted)
@@ -72,7 +72,7 @@
 
 ### Community 0 - "seed_demo_data.py"
 Cohesion: 0.09
-Nodes (59): downgrade(), upgrade(), Base, hash_password(), verify_password(), AegisRole, CatalogValue, Facility (+51 more)
+Nodes (58): downgrade(), upgrade(), Base, hash_password(), verify_password(), AegisRole, CatalogValue, Facility (+50 more)
 
 ### Community 1 - "AEGIS — Requerimiento funcional de la Plataforma de Gobierno Clínico"
 Cohesion: 0.17
@@ -80,11 +80,11 @@ Nodes (11): 10. Requerimientos no funcionales mínimos, 11. Reglas globales de n
 
 ### Community 2 - "deps.py"
 Cohesion: 0.06
-Nodes (64): Punto único de registro de routers. Al agregar un módulo nuevo, se agrega su…, get_settings(), Configuración centralizada. Todo valor de entorno se lee UNA vez aquí, nunca…, Settings, get_db(), Sesión de base de datos + soporte de Row-Level Security multi-centro. Decisión…, Fija el contexto que consumen las políticas RLS definidas en las migraciones., set_tenant_context() (+56 more)
+Nodes (65): Punto único de registro de routers. Al agregar un módulo nuevo, se agrega su…, get_settings(), Configuración centralizada. Todo valor de entorno se lee UNA vez aquí, nunca…, Settings, get_db(), Sesión de base de datos + soporte de Row-Level Security multi-centro. Decisión…, Fija el contexto que consumen las políticas RLS definidas en las migraciones., set_tenant_context() (+57 more)
 
 ### Community 3 - "App.tsx"
 Cohesion: 0.07
-Nodes (58): ApiError, apiFetch(), apiFetchJson(), apiPostJson(), AUTH_DISABLED, authorizedFetch(), login(), LoginResponse (+50 more)
+Nodes (57): ApiError, apiFetch(), apiFetchJson(), apiPostJson(), AUTH_DISABLED, authorizedFetch(), login(), LoginResponse (+49 more)
 
 ### Community 4 - "ucca/service.py"
 Cohesion: 0.12
@@ -96,15 +96,15 @@ Nodes (27): 10. Reportería y Publisher Engine (M09), 11. Integraciones (secció
 
 ### Community 6 - "package.json"
 Cohesion: 0.08
-Nodes (23): dependencies, react, react-dom, react-router-dom, devDependencies, @types/react, @types/react-dom, typescript (+15 more)
+Nodes (24): dependencies, react, react-dom, react-router-dom, devDependencies, @types/react, @types/react-dom, typescript (+16 more)
 
 ### Community 7 - "compilerOptions"
 Cohesion: 0.13
 Nodes (14): compilerOptions, isolatedModules, jsx, lib, module, moduleResolution, noEmit, resolveJsonModule (+6 more)
 
 ### Community 8 - "engine.py"
-Cohesion: 0.14
-Nodes (19): evaluate(), Motor de reglas desacoplado (sección 8 de la arquitectura técnica). UCCA,…, Contexto mínimo común. Cada ruleset puede leer campos adicionales de `extra`., register_ruleset(), RuleContext, Ruleset, RuleVerdict, Omh001Ruleset (+11 more)
+Cohesion: 0.15
+Nodes (18): evaluate(), Motor de reglas desacoplado (sección 8 de la arquitectura técnica). UCCA,…, Contexto mínimo común. Cada ruleset puede leer campos adicionales de `extra`., register_ruleset(), RuleContext, Ruleset, RuleVerdict, Omh001Ruleset (+10 more)
 
 ### Community 9 - "7. Módulos funcionales"
 Cohesion: 0.10
@@ -131,8 +131,8 @@ Cohesion: 0.22
 Nodes (8): Cambios de contenido requeridos, Contexto, Estructura final, Flujo de ejecución (alto nivel), Fuera de alcance, Objetivo, Reorganización de repo — AEGIS / clinical-governance, Riesgos / rollback
 
 ### Community 15 - "test_ucca_cycles.py"
-Cohesion: 0.17
-Nodes (9): client(), _fake_db(), _FakeSession, fixture, Prueba de regresión: GET /ucca/cycles debe existir y responder 200 con auth…, Sesión mínima: el bypass de desarrollo consulta el admin (None -> usuario dev)…, test_list_cycles_without_token(), fastapi_testclient (+1 more)
+Cohesion: 0.15
+Nodes (10): client(), _fake_db(), _FakeSession, fixture, Prueba de regresión: GET /ucca/cycles debe existir y responder 200 con auth…, Sesión mínima: el bypass de desarrollo consulta el admin (None -> usuario dev)…, test_list_cycles_without_token(), fastapi_testclient (+2 more)
 
 ### Community 16 - "env.py"
 Cohesion: 0.11
@@ -183,4 +183,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **What connects `name`, `private`, `version` to the rest of the system?**
   _151 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `seed_demo_data.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.0889423076923077 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.08978174603174603 - nodes in this community are weakly interconnected._
