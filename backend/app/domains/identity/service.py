@@ -127,8 +127,54 @@ def list_roles(db: Session) -> list[AegisRole]:
     return list(db.scalars(select(AegisRole).order_by(AegisRole.name)).all())
 
 
-def list_users(db: Session) -> list[User]:
-    return list(db.scalars(select(User).order_by(User.full_name)).all())
+def list_users(db: Session) -> list[dict]:
+    """Usuarios con profesión (M01) y especialidad del profesional vinculado (M02), sin
+    duplicar datos: la especialidad vive en Professional y se lee por user_id."""
+    rows = db.execute(
+        select(User, Profession.name.label("profession_name"), Professional.specialty)
+        .outerjoin(Profession, User.profession_id == Profession.id)
+        .outerjoin(Professional, Professional.user_id == User.id)
+        .order_by(User.full_name)
+    ).all()
+    return [
+        {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.full_name,
+            "is_active": user.is_active,
+            "profession_name": profession_name,
+            "specialty": specialty,
+        }
+        for user, profession_name, specialty in rows
+    ]
+
+
+def set_user_status(db: Session, *, actor_user_id: uuid.UUID, user_id: uuid.UUID, is_active: bool) -> User:
+    """Activa/desactiva una cuenta. Nunca se borra (regla global #2: autoría histórica).
+    Un usuario no puede desactivarse a sí mismo."""
+    user = db.scalar(select(User).where(User.id == user_id))
+    if not user:
+        raise LookupError("Usuario no encontrado")
+    if user.id == actor_user_id and not is_active:
+        raise PermissionError("No puede desactivar su propia cuenta.")
+    if user.is_active == is_active:
+        return user
+
+    previous = user.is_active
+    user.is_active = is_active
+    record_event(
+        db,
+        actor_user_id=str(actor_user_id),
+        module="identity",
+        entity_type="User",
+        entity_id=str(user.id),
+        action="activate" if is_active else "deactivate",
+        previous_values={"is_active": previous},
+        new_values={"is_active": is_active},
+    )
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 def list_professionals(db: Session) -> list[dict]:

@@ -119,7 +119,12 @@
       "empty": "No users recorded.",
       "name": "Name",
       "email": "Email",
-      "status": "Status"
+      "status": "Status",
+      "profession": "Profession",
+      "specialty": "Specialty",
+      "activate": "Activate user",
+      "deactivate": "Deactivate user",
+      "statusError": "Could not change the status."
     },
     "facilities": {
       "title": "Facilities",

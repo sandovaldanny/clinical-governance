@@ -119,7 +119,12 @@
       "empty": "No hay usuarios registrados.",
       "name": "Nombre",
       "email": "Correo",
-      "status": "Estado"
+      "status": "Estado",
+      "profession": "Profesión",
+      "specialty": "Especialidad",
+      "activate": "Activar usuario",
+      "deactivate": "Desactivar usuario",
+      "statusError": "No fue posible cambiar el estado."
     },
     "facilities": {
       "title": "Centros médicos",

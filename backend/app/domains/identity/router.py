@@ -83,7 +83,25 @@ def list_users(
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(require_permission("users.view")),
 ) -> list[schemas.UserOut]:
-    return service.list_users(db)
+    return [schemas.UserOut.model_validate(row) for row in service.list_users(db)]
+
+
+@router.patch("/users/{user_id}/status", response_model=schemas.UserOut)
+def set_user_status(
+    user_id: uuid.UUID,
+    payload: schemas.UserStatusUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("users.manage")),
+) -> schemas.UserOut:
+    try:
+        user = service.set_user_status(
+            db, actor_user_id=uuid.UUID(current_user.id), user_id=user_id, is_active=payload.is_active
+        )
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    return schemas.UserOut.model_validate(user)
 
 
 @router.get("/professionals", response_model=list[schemas.ProfessionalOut])

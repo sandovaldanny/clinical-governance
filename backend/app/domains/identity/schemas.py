@@ -30,8 +30,14 @@ class UserOut(BaseModel):
     email: EmailStr
     full_name: str
     is_active: bool
+    profession_name: str | None = None
+    specialty: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserStatusUpdateRequest(BaseModel):
+    is_active: bool
 
 
 class FacilityOut(BaseModel):

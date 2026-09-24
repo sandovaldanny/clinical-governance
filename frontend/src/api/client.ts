@@ -79,3 +79,18 @@ export async function apiPostJson<T>(path: string, body: unknown, token?: string
   }
   return (await response.json()) as T;
 }
+
+export async function apiPatchJson<T>(path: string, body: unknown, token?: string): Promise<T> {
+  const response = await apiFetch(path, { method: "PATCH", body: JSON.stringify(body) }, token);
+  if (!response.ok) {
+    let detail = `HTTP ${response.status}`;
+    try {
+      const err = (await response.json()) as { detail?: string };
+      if (typeof err.detail === "string") detail = err.detail;
+    } catch {
+      /* ignore */
+    }
+    throw new ApiError(detail, response.status);
+  }
+  return (await response.json()) as T;
+}
