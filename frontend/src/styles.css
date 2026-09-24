@@ -69,6 +69,7 @@ button:disabled { cursor: not-allowed; opacity: .55; }
 
 .chip {
   display: inline-block;
+  white-space: nowrap;
   padding: 3px 10px;
   border-radius: 999px;
   background: #E6F5F4;

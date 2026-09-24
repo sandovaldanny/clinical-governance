@@ -5,6 +5,7 @@ otorgan por rol, nunca por excepción directa a la cuenta (sección 6.2 del func
 """
 from __future__ import annotations
 
+import secrets
 import uuid
 
 from sqlalchemy import select
@@ -13,9 +14,11 @@ from sqlalchemy.orm import Session
 from app.core.audit import record_event
 from app.core.security import hash_password, verify_password
 from app.domains.identity.models import (
+    USER_STATUSES,
     AegisRole,
     CatalogValue,
     Facility,
+    OrganizationalPosition,
     Permission,
     Profession,
     Professional,
@@ -78,38 +81,140 @@ def resolve_facility_scope(db: Session, user_id: uuid.UUID) -> tuple[list[str], 
     return facility_ids, is_corporate
 
 
+def _generate_temporary_password() -> str:
+    """Contraseña temporal gestionada por el sistema (M01 doc: "Password — System managed";
+    §6.3 arquitectura): se muestra una sola vez y se fuerza cambio en el primer acceso."""
+    return secrets.token_urlsafe(9)
+
+
+def _full_name(first_name: str | None, last_name: str | None) -> str:
+    return " ".join(part for part in (first_name, last_name) if part).strip()
+
+
+def _role_codes(db: Session, role_ids: list[uuid.UUID]) -> set[str]:
+    if not role_ids:
+        return set()
+    return set(db.scalars(select(AegisRole.code).where(AegisRole.id.in_(role_ids))).all())
+
+
+def _validate_user_rules(
+    *, facility_ids: list[uuid.UUID] | None, role_ids: list[uuid.UUID] | None,
+    role_codes: set[str], profession_id: uuid.UUID | None,
+) -> None:
+    """Reglas de negocio M01 §6: ≥1 centro, ≥1 rol, todo usuario clínico con profesión."""
+    if facility_ids is not None and not facility_ids:
+        raise ValueError("Todo usuario debe tener al menos un centro asignado.")
+    if role_ids is not None and not role_ids:
+        raise ValueError("Todo usuario debe tener al menos un rol asignado.")
+    if "clinician" in role_codes and profession_id is None:
+        raise ValueError("Todo usuario clínico debe tener una profesión asignada.")
+
+
+def _replace_facilities(db: Session, user_id: uuid.UUID, facility_ids: list[uuid.UUID], is_corporate: bool) -> None:
+    for row in db.scalars(select(UserFacilityAssignment).where(UserFacilityAssignment.user_id == user_id)).all():
+        db.delete(row)
+    for facility_id in facility_ids:
+        db.add(UserFacilityAssignment(user_id=user_id, facility_id=facility_id, is_corporate_scope=is_corporate))
+
+
+def _replace_roles(db: Session, user_id: uuid.UUID, role_ids: list[uuid.UUID]) -> None:
+    for row in db.scalars(select(UserRoleAssignment).where(UserRoleAssignment.user_id == user_id)).all():
+        db.delete(row)
+    for role_id in role_ids:
+        db.add(UserRoleAssignment(user_id=user_id, role_id=role_id))
+
+
+def get_user_or_404(db: Session, user_id: uuid.UUID) -> User:
+    user = db.scalar(select(User).where(User.id == user_id))
+    if not user:
+        raise LookupError("Usuario no encontrado")
+    return user
+
+
+def user_to_dict(db: Session, user: User) -> dict:
+    """UserOut para un usuario: nombres de cargo/profesión, especialidad del profesional
+    vinculado y asignaciones de centros/roles (sin duplicar datos)."""
+    facility_rows = db.execute(
+        select(UserFacilityAssignment.facility_id, UserFacilityAssignment.is_corporate_scope).where(
+            UserFacilityAssignment.user_id == user.id
+        )
+    ).all()
+    role_ids = db.scalars(select(UserRoleAssignment.role_id).where(UserRoleAssignment.user_id == user.id)).all()
+    position_name = (
+        db.scalar(select(OrganizationalPosition.title).where(OrganizationalPosition.id == user.organizational_position_id))
+        if user.organizational_position_id else None
+    )
+    profession_name = (
+        db.scalar(select(Profession.name).where(Profession.id == user.profession_id)) if user.profession_id else None
+    )
+    specialty = db.scalar(select(Professional.specialty).where(Professional.user_id == user.id))
+    return {
+        "id": user.id,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "full_name": user.full_name,
+        "employee_number": user.employee_number,
+        "mobile": user.mobile,
+        "status": user.status or "active",
+        "is_active": bool(user.is_active),
+        "organizational_position_id": user.organizational_position_id,
+        "position_name": position_name,
+        "profession_id": user.profession_id,
+        "profession_name": profession_name,
+        "specialty": specialty,
+        "facility_ids": [r[0] for r in facility_rows],
+        "is_corporate_scope": any(r[1] for r in facility_rows),
+        "role_ids": list(role_ids),
+        "must_change_password": bool(user.must_change_password),
+        "last_login_at": user.last_login_at,
+        "created_at": user.created_at,
+    }
+
+
 def create_user(
     db: Session,
     *,
     actor_user_id: uuid.UUID,
+    first_name: str,
+    last_name: str,
+    employee_number: str,
     email: str,
-    full_name: str,
-    employee_number: str | None,
+    mobile: str | None,
+    organizational_position_id: uuid.UUID | None,
     profession_id: uuid.UUID | None,
     facility_ids: list[uuid.UUID],
+    is_corporate_scope: bool,
     role_ids: list[uuid.UUID],
-) -> User:
-    """Regla del funcional (sección 6.1/12): todo usuario debe tener al menos un centro y un rol."""
-    if not facility_ids:
-        raise ValueError("Todo usuario debe tener al menos un centro asignado.")
-    if not role_ids:
-        raise ValueError("Todo usuario debe tener al menos un rol asignado.")
+) -> tuple[User, str]:
+    """Flujo M01: crear → cargo → centro → profesión → roles → activar. Devuelve (usuario,
+    contraseña temporal en claro) — la contraseña solo existe en esta respuesta."""
+    if db.scalar(select(User).where(User.email == email)):
+        raise PermissionError("Ya existe un usuario con ese correo.")
+    _validate_user_rules(
+        facility_ids=facility_ids, role_ids=role_ids, role_codes=_role_codes(db, role_ids), profession_id=profession_id
+    )
 
+    temporary_password = _generate_temporary_password()
     user = User(
         email=email,
-        full_name=full_name,
+        first_name=first_name,
+        last_name=last_name,
+        full_name=_full_name(first_name, last_name),
         employee_number=employee_number,
+        mobile=mobile,
+        organizational_position_id=organizational_position_id,
         profession_id=profession_id,
+        hashed_password=hash_password(temporary_password),
         must_change_password=True,
+        status="active",
         is_active=True,
+        created_by_user_id=actor_user_id,
     )
     db.add(user)
     db.flush()
-
-    for facility_id in facility_ids:
-        db.add(UserFacilityAssignment(user_id=user.id, facility_id=facility_id))
-    for role_id in role_ids:
-        db.add(UserRoleAssignment(user_id=user.id, role_id=role_id))
+    _replace_facilities(db, user.id, facility_ids, is_corporate_scope)
+    _replace_roles(db, user.id, role_ids)
 
     record_event(
         db,
@@ -118,8 +223,77 @@ def create_user(
         entity_type="User",
         entity_id=str(user.id),
         action="create",
-        new_values={"email": email, "full_name": full_name},
+        new_values={
+            "email": email,
+            "full_name": user.full_name,
+            "employee_number": employee_number,
+            "facility_ids": [str(f) for f in facility_ids],
+            "role_ids": [str(r) for r in role_ids],
+        },
     )
+    db.commit()
+    db.refresh(user)
+    return user, temporary_password
+
+
+def update_user(db: Session, *, actor_user_id: uuid.UUID, user_id: uuid.UUID, data: dict) -> User:
+    """Edición parcial. `facility_ids` / `role_ids` presentes reemplazan las asignaciones."""
+    user = get_user_or_404(db, user_id)
+    facility_ids = data.pop("facility_ids", None)
+    is_corporate = data.pop("is_corporate_scope", None)
+    role_ids = data.pop("role_ids", None)
+
+    new_email = data.get("email")
+    if new_email and new_email != user.email and db.scalar(select(User).where(User.email == new_email)):
+        raise PermissionError("Ya existe un usuario con ese correo.")
+
+    effective_profession = data.get("profession_id", user.profession_id)
+    role_codes = _role_codes(db, role_ids) if role_ids is not None else set()
+    _validate_user_rules(
+        facility_ids=facility_ids, role_ids=role_ids, role_codes=role_codes, profession_id=effective_profession
+    )
+
+    previous, new = _apply_changes(user, data)
+    if "first_name" in new or "last_name" in new:
+        previous["full_name"] = user.full_name
+        user.full_name = _full_name(user.first_name, user.last_name)
+        new["full_name"] = user.full_name
+
+    if facility_ids is not None or is_corporate is not None:
+        current_rows = db.execute(
+            select(UserFacilityAssignment.facility_id, UserFacilityAssignment.is_corporate_scope).where(
+                UserFacilityAssignment.user_id == user.id
+            )
+        ).all()
+        current_ids = [r[0] for r in current_rows]
+        current_corp = any(r[1] for r in current_rows)
+        target_ids = facility_ids if facility_ids is not None else current_ids
+        target_corp = is_corporate if is_corporate is not None else current_corp
+        _replace_facilities(db, user.id, target_ids, target_corp)
+        previous["facility_ids"] = [str(f) for f in current_ids]
+        new["facility_ids"] = [str(f) for f in target_ids]
+        previous["is_corporate_scope"] = current_corp
+        new["is_corporate_scope"] = target_corp
+    if role_ids is not None:
+        current_roles = db.scalars(select(UserRoleAssignment).where(UserRoleAssignment.user_id == user.id)).all()
+        for row in current_roles:
+            db.delete(row)
+        for role_id in role_ids:
+            db.add(UserRoleAssignment(user_id=user.id, role_id=role_id))
+        previous["role_ids"] = [str(r.role_id) for r in current_roles]
+        new["role_ids"] = [str(r) for r in role_ids]
+
+    if new:
+        record_event(
+            db,
+            actor_user_id=str(actor_user_id),
+            module="identity",
+            entity_type="User",
+            entity_id=str(user.id),
+            action="update",
+            previous_values=previous,
+            new_values=new,
+        )
     db.commit()
     db.refresh(user)
     return user
@@ -143,53 +317,85 @@ def list_roles(db: Session) -> list[AegisRole]:
 
 
 def list_users(db: Session) -> list[dict]:
-    """Usuarios con profesión (M01) y especialidad del profesional vinculado (M02), sin
-    duplicar datos: la especialidad vive en Professional y se lee por user_id."""
+    """Registro de usuarios (M01 §9 "User Register") con cargo, profesión, especialidad y
+    asignaciones. Tres consultas en total, sin N+1."""
     rows = db.execute(
-        select(User, Profession.name.label("profession_name"), Professional.specialty)
+        select(User, OrganizationalPosition.title, Profession.name, Professional.specialty)
+        .outerjoin(OrganizationalPosition, User.organizational_position_id == OrganizationalPosition.id)
         .outerjoin(Profession, User.profession_id == Profession.id)
         .outerjoin(Professional, Professional.user_id == User.id)
         .order_by(User.full_name)
     ).all()
-    return [
-        {
-            "id": user.id,
-            "email": user.email,
-            "full_name": user.full_name,
-            "is_active": user.is_active,
-            "profession_name": profession_name,
-            "specialty": specialty,
-        }
-        for user, profession_name, specialty in rows
-    ]
+    facilities: dict[uuid.UUID, list] = {}
+    for user_id, facility_id, corp in db.execute(
+        select(UserFacilityAssignment.user_id, UserFacilityAssignment.facility_id, UserFacilityAssignment.is_corporate_scope)
+    ).all():
+        facilities.setdefault(user_id, []).append((facility_id, corp))
+    roles: dict[uuid.UUID, list] = {}
+    for user_id, role_id in db.execute(select(UserRoleAssignment.user_id, UserRoleAssignment.role_id)).all():
+        roles.setdefault(user_id, []).append(role_id)
+
+    result = []
+    for user, position_name, profession_name, specialty in rows:
+        f = facilities.get(user.id, [])
+        result.append(
+            {
+                "id": user.id,
+                "email": user.email,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "full_name": user.full_name,
+                "employee_number": user.employee_number,
+                "mobile": user.mobile,
+                "status": user.status or "active",
+                "is_active": bool(user.is_active),
+                "organizational_position_id": user.organizational_position_id,
+                "position_name": position_name,
+                "profession_id": user.profession_id,
+                "profession_name": profession_name,
+                "specialty": specialty,
+                "facility_ids": [x[0] for x in f],
+                "is_corporate_scope": any(x[1] for x in f),
+                "role_ids": roles.get(user.id, []),
+                "must_change_password": bool(user.must_change_password),
+                "last_login_at": user.last_login_at,
+                "created_at": user.created_at,
+            }
+        )
+    return result
 
 
-def set_user_status(db: Session, *, actor_user_id: uuid.UUID, user_id: uuid.UUID, is_active: bool) -> User:
-    """Activa/desactiva una cuenta. Nunca se borra (regla global #2: autoría histórica).
-    Un usuario no puede desactivarse a sí mismo."""
-    user = db.scalar(select(User).where(User.id == user_id))
-    if not user:
-        raise LookupError("Usuario no encontrado")
-    if user.id == actor_user_id and not is_active:
-        raise PermissionError("No puede desactivar su propia cuenta.")
-    if user.is_active == is_active:
+def set_user_status(db: Session, *, actor_user_id: uuid.UUID, user_id: uuid.UUID, status: str) -> User:
+    """Activa / inactiva / suspende una cuenta. Nunca se borra (regla global #2: autoría
+    histórica). Un usuario no puede quitarse a sí mismo el estado activo."""
+    if status not in USER_STATUSES:
+        raise ValueError(f"Estado inválido: {status}")
+    user = get_user_or_404(db, user_id)
+    if user.id == actor_user_id and status != "active":
+        raise PermissionError("No puede desactivar ni suspender su propia cuenta.")
+    if user.status == status:
         return user
 
-    previous = user.is_active
-    user.is_active = is_active
+    previous = user.status
+    user.status = status
+    user.is_active = status == "active"
     record_event(
         db,
         actor_user_id=str(actor_user_id),
         module="identity",
         entity_type="User",
         entity_id=str(user.id),
-        action="activate" if is_active else "deactivate",
-        previous_values={"is_active": previous},
-        new_values={"is_active": is_active},
+        action="activate" if status == "active" else status,
+        previous_values={"status": previous},
+        new_values={"status": status},
     )
     db.commit()
     db.refresh(user)
     return user
+
+
+def list_positions(db: Session) -> list[OrganizationalPosition]:
+    return list(db.scalars(select(OrganizationalPosition).order_by(OrganizationalPosition.title)).all())
 
 
 def list_professionals(db: Session) -> list[dict]:

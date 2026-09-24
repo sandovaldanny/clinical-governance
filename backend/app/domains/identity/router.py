@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -95,13 +96,15 @@ def set_user_status(
 ) -> schemas.UserOut:
     try:
         user = service.set_user_status(
-            db, actor_user_id=uuid.UUID(current_user.id), user_id=user_id, is_active=payload.is_active
+            db, actor_user_id=uuid.UUID(current_user.id), user_id=user_id, status=payload.status
         )
     except LookupError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     except PermissionError as exc:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
-    return schemas.UserOut.model_validate(user)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    return schemas.UserOut.model_validate(service.user_to_dict(db, user))
 
 
 @router.get("/professionals", response_model=list[schemas.ProfessionalOut])
@@ -121,23 +124,56 @@ def list_catalogs(
     return service.list_catalog_values(db, catalog_type=catalog_type)
 
 
-@router.post("/users", response_model=schemas.UserOut, status_code=status.HTTP_201_CREATED)
+@router.get("/positions", response_model=list[schemas.PositionOut])
+def list_positions(
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("users.view")),
+) -> list[schemas.PositionOut]:
+    return service.list_positions(db)
+
+
+@router.post("/users", response_model=schemas.UserCreatedOut, status_code=status.HTTP_201_CREATED)
 def create_user(
     payload: schemas.UserCreateRequest,
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(require_permission("users.manage")),
-) -> schemas.UserOut:
+) -> schemas.UserCreatedOut:
     try:
-        user = service.create_user(
-            db,
-            actor_user_id=uuid.UUID(current_user.id),
-            email=payload.email,
-            full_name=payload.full_name,
-            employee_number=payload.employee_number,
-            profession_id=payload.profession_id,
-            facility_ids=payload.facility_ids,
-            role_ids=payload.role_ids,
+        user, temporary_password = service.create_user(
+            db, actor_user_id=uuid.UUID(current_user.id), **payload.model_dump()
         )
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
-    return user
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Referencia inválida (cargo, centro, profesión o rol) o correo duplicado."
+        ) from exc
+    return schemas.UserCreatedOut(
+        user=schemas.UserOut.model_validate(service.user_to_dict(db, user)), temporary_password=temporary_password
+    )
+
+
+@router.patch("/users/{user_id}", response_model=schemas.UserOut)
+def update_user(
+    user_id: uuid.UUID,
+    payload: schemas.UserUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("users.manage")),
+) -> schemas.UserOut:
+    try:
+        user = service.update_user(
+            db, actor_user_id=uuid.UUID(current_user.id), user_id=user_id, data=payload.model_dump(exclude_unset=True)
+        )
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Referencia inválida o correo duplicado.") from exc
+    return schemas.UserOut.model_validate(service.user_to_dict(db, user))
