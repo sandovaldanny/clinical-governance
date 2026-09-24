@@ -212,7 +212,18 @@
       "empty": "No hay roles registrados.",
       "role": "Rol",
       "code": "Código",
-      "system": "Sistema"
+      "system": "Sistema",
+      "new": "Nuevo rol",
+      "edit": "Editar rol",
+      "description": "Descripción",
+      "codeHint": "Identificador estable en minúsculas (ej. external_auditor). No se puede cambiar después.",
+      "permissions": "Matriz de permisos",
+      "permissionsHint": "Cambiar la matriz aplica de inmediato a todos los usuarios con este rol. Los permisos viajan en el token: los usuarios con sesión activa los reciben en su próximo inicio de sesión.",
+      "users": "Usuarios",
+      "usersCount": "{{count}} usuario(s)",
+      "sysadminLocked": "System Administrator conserva todos los permisos por definición; su matriz no es editable.",
+      "colPermissions": "Permisos",
+      "moduleAll": "Todos"
     },
     "positions": {
       "title": "Cargos",

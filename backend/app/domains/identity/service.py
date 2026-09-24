@@ -465,6 +465,139 @@ def update_catalog_value(db: Session, *, actor_user_id: uuid.UUID, value_id: uui
     return _update_audited(db, obj, actor_user_id=actor_user_id, entity_type="CatalogValue", data=data)
 
 
+def list_professions(db: Session) -> list[Profession]:
+    return list(db.scalars(select(Profession).order_by(Profession.name)).all())
+
+
+# ---------------------------------------------------------------------------
+# Roles y matriz rol→permiso (M01 doc, tablas 5/6/8)
+# ---------------------------------------------------------------------------
+
+SYSTEM_ADMIN_CODE = "system_administrator"
+
+
+def list_permissions_grouped(db: Session) -> list[dict]:
+    """Permisos agrupados por módulo (prefijo del código), en orden estable."""
+    groups: dict[str, list[Permission]] = {}
+    for perm in db.scalars(select(Permission).order_by(Permission.module, Permission.code)).all():
+        groups.setdefault(perm.module or perm.code.split(".")[0], []).append(perm)
+    return [{"module": module, "permissions": perms} for module, perms in groups.items()]
+
+
+def role_to_dict(db: Session, role: AegisRole) -> dict:
+    user_ids = db.scalars(select(UserRoleAssignment.user_id).where(UserRoleAssignment.role_id == role.id)).all()
+    permission_ids = db.scalars(
+        select(RolePermissionAssignment.permission_id).where(RolePermissionAssignment.role_id == role.id)
+    ).all()
+    return {
+        "id": role.id,
+        "code": role.code,
+        "name": role.name,
+        "description": role.description or "",
+        "is_system_defined": bool(role.is_system_defined),
+        "is_active": role.is_active if role.is_active is not None else True,
+        "permission_ids": list(permission_ids),
+        "user_count": len(set(user_ids)),
+    }
+
+
+def list_roles(db: Session) -> list[dict]:
+    roles = db.scalars(select(AegisRole).order_by(AegisRole.name)).all()
+    perms: dict[uuid.UUID, list[uuid.UUID]] = {}
+    for role_id, permission_id in db.execute(
+        select(RolePermissionAssignment.role_id, RolePermissionAssignment.permission_id)
+    ).all():
+        perms.setdefault(role_id, []).append(permission_id)
+    users: dict[uuid.UUID, set[uuid.UUID]] = {}
+    for role_id, user_id in db.execute(select(UserRoleAssignment.role_id, UserRoleAssignment.user_id)).all():
+        users.setdefault(role_id, set()).add(user_id)
+    return [
+        {
+            "id": r.id, "code": r.code, "name": r.name, "description": r.description or "",
+            "is_system_defined": bool(r.is_system_defined),
+            "is_active": r.is_active if r.is_active is not None else True,
+            "permission_ids": perms.get(r.id, []), "user_count": len(users.get(r.id, set())),
+        }
+        for r in roles
+    ]
+
+
+def _validate_permission_ids(db: Session, permission_ids: list[uuid.UUID]) -> None:
+    if not permission_ids:
+        return
+    valid = set(db.scalars(select(Permission.id).where(Permission.id.in_(permission_ids))).all())
+    if set(permission_ids) - valid:
+        raise ValueError("Uno o más permisos no existen.")
+
+
+def create_role(
+    db: Session, *, actor_user_id: uuid.UUID, code: str, name: str, description: str, permission_ids: list[uuid.UUID],
+) -> AegisRole:
+    _validate_permission_ids(db, permission_ids)
+    if db.scalar(select(AegisRole).where(AegisRole.code == code)):
+        raise PermissionError("Ya existe un rol con ese código.")
+    role = AegisRole(code=code, name=name, description=description, is_system_defined=False, is_active=True)
+    db.add(role)
+    db.flush()
+    for permission_id in permission_ids:
+        db.add(RolePermissionAssignment(role_id=role.id, permission_id=permission_id))
+    record_event(
+        db, actor_user_id=str(actor_user_id), module="identity", entity_type="AegisRole", entity_id=str(role.id),
+        action="create", new_values={"code": code, "name": name, "permission_ids": [str(p) for p in permission_ids]},
+    )
+    db.commit()
+    db.refresh(role)
+    return role
+
+
+def update_role(db: Session, *, actor_user_id: uuid.UUID, role_id: uuid.UUID, data: dict) -> AegisRole:
+    """Edita nombre/descripción/estado y, si viene `permission_ids`, reemplaza la matriz del rol —
+    el cambio aplica a todos los usuarios con ese rol (M01 doc, tabla 8)."""
+    role = _get_or_404(db, AegisRole, role_id, "Rol")
+    permission_ids = data.pop("permission_ids", None)
+
+    if role.code == SYSTEM_ADMIN_CODE:
+        if permission_ids is not None:
+            raise PermissionError("System Administrator conserva siempre todos los permisos; su matriz no se edita.")
+        if data.get("is_active") is False:
+            raise PermissionError("System Administrator no puede desactivarse.")
+
+    previous: dict = {}
+    new: dict = {}
+    if permission_ids is not None:
+        _validate_permission_ids(db, permission_ids)
+        current = db.scalars(select(RolePermissionAssignment).where(RolePermissionAssignment.role_id == role.id)).all()
+        current_ids = {row.permission_id for row in current}
+        target_ids = set(permission_ids)
+        for row in current:
+            if row.permission_id not in target_ids:
+                db.delete(row)
+        for permission_id in target_ids - current_ids:
+            db.add(RolePermissionAssignment(role_id=role.id, permission_id=permission_id))
+        if current_ids != target_ids:
+            previous["permission_ids"] = sorted(str(p) for p in current_ids)
+            new["permission_ids"] = sorted(str(p) for p in target_ids)
+
+    if data.get("is_active") is False:
+        assigned = db.scalars(select(UserRoleAssignment.user_id).where(UserRoleAssignment.role_id == role.id)).all()
+        if assigned:
+            raise PermissionError(
+                f"El rol tiene {len(set(assigned))} usuario(s) asignado(s). Reasigne o retire el rol antes de desactivarlo."
+            )
+
+    prev_fields, new_fields = _apply_changes(role, data)
+    previous.update(prev_fields)
+    new.update(new_fields)
+    if new:
+        record_event(
+            db, actor_user_id=str(actor_user_id), module="identity", entity_type="AegisRole", entity_id=str(role.id),
+            action="update", previous_values=previous, new_values=new,
+        )
+    db.commit()
+    db.refresh(role)
+    return role
+
+
 def list_users(db: Session) -> list[dict]:
     """Registro de usuarios (M01 §9 "User Register") con cargo, profesión, especialidad y
     asignaciones. Tres consultas en total, sin N+1."""

@@ -212,7 +212,18 @@
       "empty": "No roles recorded.",
       "role": "Role",
       "code": "Code",
-      "system": "System"
+      "system": "System",
+      "new": "New role",
+      "edit": "Edit role",
+      "description": "Description",
+      "codeHint": "Stable lowercase identifier (e.g. external_auditor). Cannot be changed later.",
+      "permissions": "Permission matrix",
+      "permissionsHint": "Changing the matrix applies immediately to every user holding this role. Permissions travel in the token: users with an active session receive them at their next sign-in.",
+      "users": "Users",
+      "usersCount": "{{count}} user(s)",
+      "sysadminLocked": "System Administrator holds every permission by definition; its matrix is not editable.",
+      "colPermissions": "Permissions",
+      "moduleAll": "All"
     },
     "positions": {
       "title": "Positions",

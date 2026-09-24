@@ -143,8 +143,39 @@ class RoleOut(BaseModel):
     description: str = ""
     is_system_defined: bool
     is_active: bool = True
+    permission_ids: list[uuid.UUID] = Field(default_factory=list)
+    user_count: int = 0
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class RoleCreateRequest(BaseModel):
+    code: str = Field(min_length=2, max_length=80, pattern=r"^[a-z][a-z0-9_]*$")
+    name: str = Field(min_length=1, max_length=150)
+    description: str = Field(default="", max_length=300)
+    permission_ids: list[uuid.UUID] = Field(default_factory=list)
+
+
+class RoleUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=150)
+    description: str | None = Field(default=None, max_length=300)
+    is_active: bool | None = None
+    permission_ids: list[uuid.UUID] | None = None
+
+
+class PermissionOut(BaseModel):
+    id: uuid.UUID
+    code: str
+    module: str
+    name: str
+    description: str = ""
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PermissionGroupOut(BaseModel):
+    module: str
+    permissions: list[PermissionOut]
 
 
 class PositionCreateRequest(BaseModel):

@@ -76,7 +76,7 @@ def list_roles(
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(require_permission("users.view")),
 ) -> list[schemas.RoleOut]:
-    return service.list_roles(db)
+    return [schemas.RoleOut.model_validate(row) for row in service.list_roles(db)]
 
 
 @router.get("/users", response_model=list[schemas.UserOut])
@@ -290,3 +290,41 @@ def update_catalog_value(
             db, actor_user_id=uuid.UUID(current_user.id), value_id=value_id, data=payload.model_dump(exclude_unset=True)
         )
     )
+
+
+# ---------------------------------------------------------------------------
+# Roles y permisos (M01 doc, tablas 5/6/8)
+# ---------------------------------------------------------------------------
+
+
+@router.get("/permissions", response_model=list[schemas.PermissionGroupOut])
+def list_permissions(
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("users.view")),
+) -> list[schemas.PermissionGroupOut]:
+    return [schemas.PermissionGroupOut.model_validate(g) for g in service.list_permissions_grouped(db)]
+
+
+@router.post("/roles", response_model=schemas.RoleOut, status_code=status.HTTP_201_CREATED)
+def create_role(
+    payload: schemas.RoleCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("roles.manage")),
+) -> schemas.RoleOut:
+    role = _domain_errors(lambda: service.create_role(db, actor_user_id=uuid.UUID(current_user.id), **payload.model_dump()))
+    return schemas.RoleOut.model_validate(service.role_to_dict(db, role))
+
+
+@router.patch("/roles/{role_id}", response_model=schemas.RoleOut)
+def update_role(
+    role_id: uuid.UUID,
+    payload: schemas.RoleUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("roles.manage")),
+) -> schemas.RoleOut:
+    role = _domain_errors(
+        lambda: service.update_role(
+            db, actor_user_id=uuid.UUID(current_user.id), role_id=role_id, data=payload.model_dump(exclude_unset=True)
+        )
+    )
+    return schemas.RoleOut.model_validate(service.role_to_dict(db, role))
