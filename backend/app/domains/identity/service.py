@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from app.core.audit import record_event
 from app.core.security import hash_password, verify_password
 from app.domains.identity.models import (
+    FACILITY_STATUSES,
     USER_STATUSES,
     AegisRole,
     CatalogValue,
@@ -304,16 +305,164 @@ def set_initial_password(db: Session, user: User, raw_password: str) -> None:
     db.commit()
 
 
-def list_facilities(db: Session) -> list[Facility]:
-    return list(db.scalars(select(Facility).order_by(Facility.name)).all())
+# ---------------------------------------------------------------------------
+# Datos maestros (M02): helpers genéricos crear/editar con auditoría
+# ---------------------------------------------------------------------------
 
 
-def list_professions(db: Session) -> list[Profession]:
-    return list(db.scalars(select(Profession).order_by(Profession.name)).all())
+def _create_audited(db: Session, obj, *, actor_user_id: uuid.UUID, entity_type: str, new_values: dict):
+    db.add(obj)
+    db.flush()
+    record_event(
+        db, actor_user_id=str(actor_user_id), module="identity", entity_type=entity_type,
+        entity_id=str(obj.id), action="create", new_values=new_values,
+    )
+    db.commit()
+    db.refresh(obj)
+    return obj
 
 
-def list_roles(db: Session) -> list[AegisRole]:
-    return list(db.scalars(select(AegisRole).order_by(AegisRole.name)).all())
+def _update_audited(db: Session, obj, *, actor_user_id: uuid.UUID, entity_type: str, data: dict):
+    previous, new = _apply_changes(obj, data)
+    if new:
+        record_event(
+            db, actor_user_id=str(actor_user_id), module="identity", entity_type=entity_type,
+            entity_id=str(obj.id), action="update", previous_values=previous, new_values=new,
+        )
+    db.commit()
+    db.refresh(obj)
+    return obj
+
+
+def _get_or_404(db: Session, model, row_id: uuid.UUID, label: str):
+    row = db.scalar(select(model).where(model.id == row_id))
+    if not row:
+        raise LookupError(f"{label} no encontrado")
+    return row
+
+
+# ----- positions -----
+
+
+def create_position(db: Session, *, actor_user_id: uuid.UUID, title: str, description: str) -> OrganizationalPosition:
+    if db.scalar(select(OrganizationalPosition).where(OrganizationalPosition.title == title)):
+        raise PermissionError("Ya existe un cargo con ese nombre.")
+    obj = OrganizationalPosition(title=title, description=description, is_active=True)
+    return _create_audited(
+        db, obj, actor_user_id=actor_user_id, entity_type="OrganizationalPosition",
+        new_values={"title": title, "description": description},
+    )
+
+
+def update_position(db: Session, *, actor_user_id: uuid.UUID, position_id: uuid.UUID, data: dict) -> OrganizationalPosition:
+    obj = _get_or_404(db, OrganizationalPosition, position_id, "Cargo")
+    return _update_audited(db, obj, actor_user_id=actor_user_id, entity_type="OrganizationalPosition", data=data)
+
+
+# ----- facilities -----
+
+
+def facility_to_dict(db: Session, facility: Facility) -> dict:
+    director_name = (
+        db.scalar(select(User.full_name).where(User.id == facility.clinical_director_user_id))
+        if facility.clinical_director_user_id else None
+    )
+    return {
+        "id": facility.id,
+        "name": facility.name,
+        "city": facility.city,
+        "country": facility.country,
+        "status": facility.status or "active",
+        "is_active": bool(facility.is_active),
+        "clinical_director_user_id": facility.clinical_director_user_id,
+        "clinical_director_name": director_name,
+    }
+
+
+def list_facilities(db: Session) -> list[dict]:
+    rows = db.execute(
+        select(Facility, User.full_name)
+        .outerjoin(User, Facility.clinical_director_user_id == User.id)
+        .order_by(Facility.name)
+    ).all()
+    return [
+        {
+            "id": f.id, "name": f.name, "city": f.city, "country": f.country,
+            "status": f.status or "active", "is_active": bool(f.is_active),
+            "clinical_director_user_id": f.clinical_director_user_id, "clinical_director_name": director_name,
+        }
+        for f, director_name in rows
+    ]
+
+
+def _validate_director(db: Session, user_id: uuid.UUID | None) -> None:
+    if user_id is None:
+        return
+    if not db.scalar(select(User).where(User.id == user_id)):
+        raise ValueError("El director clínico indicado no existe.")
+
+
+def create_facility(
+    db: Session, *, actor_user_id: uuid.UUID, name: str, country: str, city: str,
+    clinical_director_user_id: uuid.UUID | None,
+) -> Facility:
+    if db.scalar(select(Facility).where(Facility.name == name)):
+        raise PermissionError("Ya existe un centro con ese nombre.")
+    _validate_director(db, clinical_director_user_id)
+    obj = Facility(
+        name=name, country=country, city=city, clinical_director_user_id=clinical_director_user_id,
+        status="active", is_active=True,
+    )
+    return _create_audited(
+        db, obj, actor_user_id=actor_user_id, entity_type="Facility",
+        new_values={"name": name, "country": country, "city": city,
+                    "clinical_director_user_id": str(clinical_director_user_id) if clinical_director_user_id else None},
+    )
+
+
+def update_facility(db: Session, *, actor_user_id: uuid.UUID, facility_id: uuid.UUID, data: dict) -> Facility:
+    obj = _get_or_404(db, Facility, facility_id, "Centro")
+    if "clinical_director_user_id" in data:
+        _validate_director(db, data["clinical_director_user_id"])
+    status = data.get("status")
+    if status is not None:
+        if status not in FACILITY_STATUSES:
+            raise ValueError(f"Estado inválido: {status}")
+        data["is_active"] = status == "active"
+    return _update_audited(db, obj, actor_user_id=actor_user_id, entity_type="Facility", data=data)
+
+
+# ----- professions -----
+
+
+def create_profession(db: Session, *, actor_user_id: uuid.UUID, name: str) -> Profession:
+    if db.scalar(select(Profession).where(Profession.name == name)):
+        raise PermissionError("Ya existe una profesión con ese nombre.")
+    obj = Profession(name=name, is_active=True)
+    return _create_audited(db, obj, actor_user_id=actor_user_id, entity_type="Profession", new_values={"name": name})
+
+
+def update_profession(db: Session, *, actor_user_id: uuid.UUID, profession_id: uuid.UUID, data: dict) -> Profession:
+    obj = _get_or_404(db, Profession, profession_id, "Profesión")
+    return _update_audited(db, obj, actor_user_id=actor_user_id, entity_type="Profession", data=data)
+
+
+# ----- catalog values -----
+
+
+def create_catalog_value(db: Session, *, actor_user_id: uuid.UUID, catalog_type: str, code: str, label: str) -> CatalogValue:
+    if db.scalar(select(CatalogValue).where(CatalogValue.catalog_type == catalog_type, CatalogValue.code == code)):
+        raise PermissionError("Ya existe un valor con ese código en el catálogo.")
+    obj = CatalogValue(catalog_type=catalog_type, code=code, label=label, is_active=True)
+    return _create_audited(
+        db, obj, actor_user_id=actor_user_id, entity_type="CatalogValue",
+        new_values={"catalog_type": catalog_type, "code": code, "label": label},
+    )
+
+
+def update_catalog_value(db: Session, *, actor_user_id: uuid.UUID, value_id: uuid.UUID, data: dict) -> CatalogValue:
+    obj = _get_or_404(db, CatalogValue, value_id, "Valor de catálogo")
+    return _update_audited(db, obj, actor_user_id=actor_user_id, entity_type="CatalogValue", data=data)
 
 
 def list_users(db: Session) -> list[dict]:

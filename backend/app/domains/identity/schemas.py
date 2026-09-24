@@ -147,6 +147,52 @@ class RoleOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class PositionCreateRequest(BaseModel):
+    title: str = Field(min_length=1, max_length=150)
+    description: str = Field(default="", max_length=300)
+
+
+class PositionUpdateRequest(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=150)
+    description: str | None = Field(default=None, max_length=300)
+    is_active: bool | None = None
+
+
+class FacilityCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=200)
+    country: str = Field(min_length=1, max_length=120)
+    city: str = Field(min_length=1, max_length=120)
+    clinical_director_user_id: uuid.UUID | None = None
+
+
+class FacilityUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=200)
+    country: str | None = Field(default=None, min_length=1, max_length=120)
+    city: str | None = Field(default=None, min_length=1, max_length=120)
+    clinical_director_user_id: uuid.UUID | None = None
+    status: FacilityStatus | None = None
+
+
+class ProfessionCreateRequest(BaseModel):
+    name: str = Field(min_length=1, max_length=150)
+
+
+class ProfessionUpdateRequest(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=150)
+    is_active: bool | None = None
+
+
+class CatalogValueCreateRequest(BaseModel):
+    catalog_type: str = Field(min_length=1, max_length=80)
+    code: str = Field(min_length=1, max_length=80)
+    label: str = Field(min_length=1, max_length=200)
+
+
+class CatalogValueUpdateRequest(BaseModel):
+    label: str | None = Field(default=None, min_length=1, max_length=200)
+    is_active: bool | None = None
+
+
 class ProfessionalOut(BaseModel):
     id: uuid.UUID
     employee_number: str

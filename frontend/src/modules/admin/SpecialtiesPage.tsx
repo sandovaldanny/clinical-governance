@@ -1,31 +1,29 @@
-import { useTranslation } from "react-i18next";
+import { MasterDataPage } from "../../components/MasterDataPage";
 
-import { DataTable } from "../../components/DataTable";
-import { PageHeader } from "../../components/PageHeader";
-import { useApiList } from "../../hooks/useApiList";
-
-type Catalog = { id: string; code: string; label: string; is_active: boolean };
+type Catalog = { id: string; catalog_type: string; code: string; label: string; is_active: boolean };
 
 export function SpecialtiesPage() {
-  const { t } = useTranslation();
-  const { data, loading, error } = useApiList<Catalog>("/identity/catalogs?catalog_type=specialty");
-
   return (
-    <section>
-      <PageHeader title={t("admin.specialties.title")} subtitle={t("admin.specialties.subtitle")} />
-      {loading && <p>{t("app.loading")}</p>}
-      {error && <p>{error}</p>}
-      {!loading && !error && (
-        <DataTable
-          rows={data}
-          emptyMessage={t("admin.specialties.empty")}
-          columns={[
-            { key: "code", header: t("admin.specialties.code"), render: (r) => <code>{r.code}</code> },
-            { key: "label", header: t("admin.specialties.name"), render: (r) => r.label },
-            { key: "active", header: t("admin.specialties.status"), render: (r) => (r.is_active ? t("app.activeF") : t("app.inactiveF")) },
-          ]}
-        />
-      )}
-    </section>
+    <MasterDataPage<Catalog>
+      titleKey="admin.specialties.title"
+      subtitleKey="admin.specialties.subtitle"
+      emptyKey="admin.specialties.empty"
+      newKey="admin.specialties.new"
+      editKey="admin.specialties.edit"
+      listPath="/identity/catalogs?catalog_type=specialty"
+      writePath="/identity/catalogs"
+      managePermission="catalogs.manage"
+      fields={[
+        { key: "catalog_type", labelKey: "", type: "text", fixed: "specialty" },
+        { key: "code", labelKey: "admin.specialties.code", type: "text", required: true, createOnly: true, hintKey: "admin.specialties.codeHint" },
+        { key: "label", labelKey: "admin.specialties.name", type: "text", required: true },
+      ]}
+      columns={[
+        { key: "code", headerKey: "admin.specialties.code", render: (r) => <code>{r.code}</code> },
+        { key: "label", headerKey: "admin.specialties.name", render: (r) => r.label },
+      ]}
+      status={{ kind: "toggle", field: "is_active" }}
+      rowLabel={(r) => r.label}
+    />
   );
 }

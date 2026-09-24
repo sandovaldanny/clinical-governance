@@ -29,7 +29,12 @@
       "inactive": "Inactivo",
       "suspended": "Suspendido",
       "closed": "Cerrado"
-    }
+    },
+    "created": "Registro creado.",
+    "updated": "Registro actualizado.",
+    "statusLabel": "Estado",
+    "activate": "Activar",
+    "deactivate": "Desactivar"
   },
   "nav": {
     "governance": "Gobierno clínico",
@@ -175,14 +180,20 @@
       "name": "Centro",
       "city": "Ciudad",
       "country": "País",
-      "status": "Estado"
+      "status": "Estado",
+      "new": "Nuevo centro",
+      "edit": "Editar centro",
+      "director": "Director clínico",
+      "directorHint": "Usuario responsable del centro (lookup sobre Usuarios activos)."
     },
     "professions": {
       "title": "Profesiones",
       "subtitle": "M02 — Profesiones clínicas para criterios UCCA/JAWDA y alcance de práctica",
       "empty": "No hay profesiones registradas.",
       "name": "Profesión",
-      "status": "Estado"
+      "status": "Estado",
+      "new": "Nueva profesión",
+      "edit": "Editar profesión"
     },
     "specialties": {
       "title": "Especialidades",
@@ -190,7 +201,10 @@
       "empty": "No hay especialidades registradas.",
       "code": "Código",
       "name": "Especialidad",
-      "status": "Estado"
+      "status": "Estado",
+      "new": "Nueva especialidad",
+      "edit": "Editar especialidad",
+      "codeHint": "Identificador estable en minúsculas, sin espacios (ej. clinical_psychology). No se puede cambiar después."
     },
     "roles": {
       "title": "Roles AEGIS",
@@ -199,6 +213,15 @@
       "role": "Rol",
       "code": "Código",
       "system": "Sistema"
+    },
+    "positions": {
+      "title": "Cargos",
+      "subtitle": "M01 — Cargos organizacionales (Group Medical Director, Clinical Director, Consultant Psychiatrist, …). No determinan permisos.",
+      "empty": "No hay cargos registrados.",
+      "new": "Nuevo cargo",
+      "edit": "Editar cargo",
+      "name": "Cargo",
+      "description": "Descripción"
     }
   }
 }

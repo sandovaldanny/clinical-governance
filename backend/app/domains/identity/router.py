@@ -60,7 +60,7 @@ def list_facilities(
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(require_permission("users.view")),
 ) -> list[schemas.FacilityOut]:
-    return service.list_facilities(db)
+    return [schemas.FacilityOut.model_validate(row) for row in service.list_facilities(db)]
 
 
 @router.get("/professions", response_model=list[schemas.ProfessionOut])
@@ -177,3 +177,116 @@ def update_user(
         db.rollback()
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Referencia inválida o correo duplicado.") from exc
     return schemas.UserOut.model_validate(service.user_to_dict(db, user))
+
+
+# ---------------------------------------------------------------------------
+# Datos maestros (M02): crear / editar / estado. Errores de dominio → HTTP.
+# ---------------------------------------------------------------------------
+
+
+def _domain_errors(fn):
+    """Envuelve la llamada al servicio traduciendo excepciones de dominio a HTTP."""
+    try:
+        return fn()
+    except LookupError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+    except PermissionError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+
+
+@router.post("/positions", response_model=schemas.PositionOut, status_code=status.HTTP_201_CREATED)
+def create_position(
+    payload: schemas.PositionCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("catalogs.manage")),
+) -> schemas.PositionOut:
+    return _domain_errors(lambda: service.create_position(db, actor_user_id=uuid.UUID(current_user.id), **payload.model_dump()))
+
+
+@router.patch("/positions/{position_id}", response_model=schemas.PositionOut)
+def update_position(
+    position_id: uuid.UUID,
+    payload: schemas.PositionUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("catalogs.manage")),
+) -> schemas.PositionOut:
+    return _domain_errors(
+        lambda: service.update_position(
+            db, actor_user_id=uuid.UUID(current_user.id), position_id=position_id, data=payload.model_dump(exclude_unset=True)
+        )
+    )
+
+
+@router.post("/facilities", response_model=schemas.FacilityOut, status_code=status.HTTP_201_CREATED)
+def create_facility(
+    payload: schemas.FacilityCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("facilities.manage")),
+) -> schemas.FacilityOut:
+    facility = _domain_errors(
+        lambda: service.create_facility(db, actor_user_id=uuid.UUID(current_user.id), **payload.model_dump())
+    )
+    return schemas.FacilityOut.model_validate(service.facility_to_dict(db, facility))
+
+
+@router.patch("/facilities/{facility_id}", response_model=schemas.FacilityOut)
+def update_facility(
+    facility_id: uuid.UUID,
+    payload: schemas.FacilityUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("facilities.manage")),
+) -> schemas.FacilityOut:
+    facility = _domain_errors(
+        lambda: service.update_facility(
+            db, actor_user_id=uuid.UUID(current_user.id), facility_id=facility_id, data=payload.model_dump(exclude_unset=True)
+        )
+    )
+    return schemas.FacilityOut.model_validate(service.facility_to_dict(db, facility))
+
+
+@router.post("/professions", response_model=schemas.ProfessionOut, status_code=status.HTTP_201_CREATED)
+def create_profession(
+    payload: schemas.ProfessionCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("catalogs.manage")),
+) -> schemas.ProfessionOut:
+    return _domain_errors(lambda: service.create_profession(db, actor_user_id=uuid.UUID(current_user.id), **payload.model_dump()))
+
+
+@router.patch("/professions/{profession_id}", response_model=schemas.ProfessionOut)
+def update_profession(
+    profession_id: uuid.UUID,
+    payload: schemas.ProfessionUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("catalogs.manage")),
+) -> schemas.ProfessionOut:
+    return _domain_errors(
+        lambda: service.update_profession(
+            db, actor_user_id=uuid.UUID(current_user.id), profession_id=profession_id, data=payload.model_dump(exclude_unset=True)
+        )
+    )
+
+
+@router.post("/catalogs", response_model=schemas.CatalogValueOut, status_code=status.HTTP_201_CREATED)
+def create_catalog_value(
+    payload: schemas.CatalogValueCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("catalogs.manage")),
+) -> schemas.CatalogValueOut:
+    return _domain_errors(lambda: service.create_catalog_value(db, actor_user_id=uuid.UUID(current_user.id), **payload.model_dump()))
+
+
+@router.patch("/catalogs/{value_id}", response_model=schemas.CatalogValueOut)
+def update_catalog_value(
+    value_id: uuid.UUID,
+    payload: schemas.CatalogValueUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("catalogs.manage")),
+) -> schemas.CatalogValueOut:
+    return _domain_errors(
+        lambda: service.update_catalog_value(
+            db, actor_user_id=uuid.UUID(current_user.id), value_id=value_id, data=payload.model_dump(exclude_unset=True)
+        )
+    )

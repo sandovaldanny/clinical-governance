@@ -5,6 +5,7 @@ import { LoginPage } from "./auth/LoginPage";
 import { useAuth } from "./auth/AuthContext";
 import { AUTH_DISABLED } from "./api/client";
 import { FacilitiesPage } from "./modules/admin/FacilitiesPage";
+import { PositionsPage } from "./modules/admin/PositionsPage";
 import { ProfessionsPage } from "./modules/admin/ProfessionsPage";
 import { RolesPage } from "./modules/admin/RolesPage";
 import { SpecialtiesPage } from "./modules/admin/SpecialtiesPage";
@@ -26,6 +27,7 @@ export function App() {
         <Route path="/ucca/cycles/:cycleId/evaluate" element={<UccaEvaluatePage />} />
         <Route path="/indicators" element={<IndicatorsPage />} />
         <Route path="/admin/users" element={<UsersPage />} />
+        <Route path="/admin/positions" element={<PositionsPage />} />
         <Route path="/admin/facilities" element={<FacilitiesPage />} />
         <Route path="/admin/professions" element={<ProfessionsPage />} />
         <Route path="/admin/specialties" element={<SpecialtiesPage />} />

@@ -29,7 +29,12 @@
       "inactive": "Inactive",
       "suspended": "Suspended",
       "closed": "Closed"
-    }
+    },
+    "created": "Record created.",
+    "updated": "Record updated.",
+    "statusLabel": "Status",
+    "activate": "Activate",
+    "deactivate": "Deactivate"
   },
   "nav": {
     "governance": "Clinical governance",
@@ -175,14 +180,20 @@
       "name": "Facility",
       "city": "City",
       "country": "Country",
-      "status": "Status"
+      "status": "Status",
+      "new": "New facility",
+      "edit": "Edit facility",
+      "director": "Clinical Director",
+      "directorHint": "User responsible for the facility (lookup over active Users)."
     },
     "professions": {
       "title": "Professions",
       "subtitle": "M02 — Clinical professions for UCCA/JAWDA criteria and scope of practice",
       "empty": "No professions recorded.",
       "name": "Profession",
-      "status": "Status"
+      "status": "Status",
+      "new": "New profession",
+      "edit": "Edit profession"
     },
     "specialties": {
       "title": "Specialties",
@@ -190,7 +201,10 @@
       "empty": "No specialties recorded.",
       "code": "Code",
       "name": "Specialty",
-      "status": "Status"
+      "status": "Status",
+      "new": "New specialty",
+      "edit": "Edit specialty",
+      "codeHint": "Stable lowercase identifier without spaces (e.g. clinical_psychology). Cannot be changed later."
     },
     "roles": {
       "title": "AEGIS roles",
@@ -199,6 +213,15 @@
       "role": "Role",
       "code": "Code",
       "system": "System"
+    },
+    "positions": {
+      "title": "Positions",
+      "subtitle": "M01 — Organisational positions (Group Medical Director, Clinical Director, Consultant Psychiatrist, …). They do not determine permissions.",
+      "empty": "No positions recorded.",
+      "new": "New position",
+      "edit": "Edit position",
+      "name": "Position",
+      "description": "Description"
     }
   }
 }
