@@ -1,50 +1,55 @@
 import { NavLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { brandTokens } from "../theme/brand-tokens";
 import { NAV_GROUPS } from "./nav-config";
 
 const linkStyle = ({ isActive }: { isActive: boolean }) => ({
   display: "block",
-  padding: "8px 16px",
-  borderRadius: 6,
+  padding: "10px 14px",
+  borderRadius: brandTokens.radius.md,
   fontSize: 14,
-  color: isActive ? brandTokens.colors.primary : brandTokens.colors.textPrimary,
-  background: isActive ? "#E6F2F0" : "transparent",
-  textDecoration: "none",
   fontWeight: isActive ? 600 : 400,
+  color: brandTokens.colors.textPrimary,
+  background: isActive ? brandTokens.colors.accentSoft : "transparent",
+  borderLeft: `3px solid ${isActive ? brandTokens.colors.accent : "transparent"}`,
+  textDecoration: "none",
+  transition: "background .15s",
 });
 
 export function Sidebar() {
+  const { t } = useTranslation();
+
   return (
     <aside
       style={{
-        width: 260,
+        width: 264,
         flexShrink: 0,
         background: brandTokens.colors.surface,
-        borderRight: "1px solid #E2E8EC",
-        padding: "16px 12px",
+        borderRight: `1px solid ${brandTokens.colors.border}`,
+        padding: "28px 16px",
         overflowY: "auto",
       }}
     >
       {NAV_GROUPS.map((group) => (
-        <div key={group.title} style={{ marginBottom: 24 }}>
+        <div key={group.titleKey} style={{ marginBottom: 32 }}>
           <p
             style={{
               fontSize: 11,
               fontWeight: 700,
               textTransform: "uppercase",
-              letterSpacing: "0.06em",
+              letterSpacing: "0.08em",
               color: brandTokens.colors.textSecondary,
-              padding: "0 8px 8px",
+              padding: "0 14px 10px",
               margin: 0,
             }}
           >
-            {group.title}
+            {t(group.titleKey)}
           </p>
-          <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <nav style={{ display: "flex", flexDirection: "column", gap: 4 }}>
             {group.items.map((item) => (
               <NavLink key={item.path} to={item.path} style={linkStyle} end={item.path === "/ucca"}>
-                {item.label}
+                {t(item.labelKey)}
               </NavLink>
             ))}
           </nav>

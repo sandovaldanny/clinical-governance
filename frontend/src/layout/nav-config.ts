@@ -1,32 +1,32 @@
-/** Navegación alineada a M01/M02 (admin) y M04/M05 (gobierno clínico) del requerimiento funcional. */
+/** Navegación alineada a M01/M02 (admin) y M04/M05 (gobierno clínico). Etiquetas vía i18n. */
 
 export type NavItem = {
-  label: string;
+  labelKey: string;
   path: string;
 };
 
 export type NavGroup = {
-  title: string;
+  titleKey: string;
   items: NavItem[];
 };
 
 export const NAV_GROUPS: NavGroup[] = [
   {
-    title: "Gobierno clínico",
+    titleKey: "nav.governance",
     items: [
-      { label: "UCCA — Ciclos", path: "/ucca" },
-      { label: "Indicadores a evaluar", path: "/indicators" },
+      { labelKey: "nav.uccaCycles", path: "/ucca" },
+      { labelKey: "nav.indicators", path: "/indicators" },
     ],
   },
   {
-    title: "Administración (M01–M02)",
+    titleKey: "nav.admin",
     items: [
-      { label: "Usuarios", path: "/admin/users" },
-      { label: "Centros médicos", path: "/admin/facilities" },
-      { label: "Profesiones", path: "/admin/professions" },
-      { label: "Especialidades", path: "/admin/specialties" },
-      { label: "Roles AEGIS", path: "/admin/roles" },
-      { label: "Profesionales", path: "/admin/professionals" },
+      { labelKey: "nav.users", path: "/admin/users" },
+      { labelKey: "nav.facilities", path: "/admin/facilities" },
+      { labelKey: "nav.professions", path: "/admin/professions" },
+      { labelKey: "nav.specialties", path: "/admin/specialties" },
+      { labelKey: "nav.roles", path: "/admin/roles" },
+      { labelKey: "nav.professionals", path: "/admin/professionals" },
     ],
   },
 ];

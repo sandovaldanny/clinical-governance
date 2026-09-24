@@ -1,24 +1,20 @@
-import { brandTokens } from "../../theme/brand-tokens";
+import { useTranslation } from "react-i18next";
+
 import { DataTable } from "../../components/DataTable";
 import { PageHeader } from "../../components/PageHeader";
+import { StatusBadge } from "../../components/StatusBadge";
 import { useApiList } from "../../hooks/useApiList";
+import { brandTokens } from "../../theme/brand-tokens";
 
-type Criterion = {
-  id: string;
-  code: string;
-  description: string;
-  severity: string;
-};
-
+type Criterion = { id: string; code: string; description: string; severity: string };
 type Catalog = { id: string; code: string; label: string; catalog_type: string };
 
-function severityColor(severity: string): string {
-  if (severity === "critical") return brandTokens.colors.danger;
-  if (severity === "major") return brandTokens.colors.warning;
-  return brandTokens.colors.textSecondary;
+function SectionTitle({ children }: { children: string }) {
+  return <h2 style={{ fontSize: 18, margin: "36px 0 14px" }}>{children}</h2>;
 }
 
 export function IndicatorsPage() {
+  const { t } = useTranslation();
   const ucca = useApiList<Criterion>("/ucca/criteria");
   const omh001 = useApiList<Catalog>("/identity/catalogs?catalog_type=omh001_investigation");
   const medication = useApiList<Catalog>("/identity/catalogs?catalog_type=medication_class");
@@ -27,59 +23,50 @@ export function IndicatorsPage() {
 
   return (
     <section>
-      <PageHeader
-        title="Indicadores a evaluar"
-        subtitle="M04 UCCA + M05 JAWDA/OMH001 — criterios versionados de la plantilla vigente y catálogos regulatorios"
-      />
+      <PageHeader title={t("indicators.title")} subtitle={t("indicators.subtitle")} />
 
-      <h2 style={{ fontSize: 17, marginTop: 28 }}>UCCA — Criterios de auditoría (plantilla vigente)</h2>
-      {ucca.loading && <p>Cargando criterios UCCA…</p>}
+      <SectionTitle>{t("indicators.uccaTitle")}</SectionTitle>
+      {ucca.loading && <p>{t("indicators.uccaLoading")}</p>}
       {ucca.error && <p>{ucca.error}</p>}
       {!ucca.loading && !ucca.error && (
         <DataTable
           rows={ucca.data}
-          emptyMessage="No hay criterios UCCA configurados."
+          emptyMessage={t("indicators.uccaEmpty")}
           columns={[
-            { key: "code", header: "Código", render: (r) => r.code },
-            { key: "desc", header: "Indicador / criterio", render: (r) => r.description },
-            {
-              key: "sev",
-              header: "Severidad",
-              render: (r) => (
-                <span style={{ color: severityColor(r.severity), fontWeight: 600 }}>{r.severity}</span>
-              ),
-            },
+            { key: "code", header: t("indicators.code"), render: (r) => <code>{r.code}</code> },
+            { key: "desc", header: t("indicators.criterion"), render: (r) => r.description },
+            { key: "sev", header: t("indicators.severity"), render: (r) => <StatusBadge code={r.severity} ns="indicators.severities" /> },
           ]}
         />
       )}
 
-      <h2 style={{ fontSize: 17, marginTop: 32 }}>OMH001 — Investigaciones requeridas (antipsicóticos)</h2>
-      {omh001.loading && <p>Cargando…</p>}
+      <SectionTitle>{t("indicators.omhTitle")}</SectionTitle>
+      {omh001.loading && <p>{t("app.loading")}</p>}
       {!omh001.loading && !omh001.error && (
         <DataTable
           rows={omh001.data}
-          emptyMessage="No hay investigaciones OMH001 configuradas."
+          emptyMessage={t("indicators.omhEmpty")}
           columns={[
-            { key: "code", header: "Código", render: (r) => r.code },
-            { key: "label", header: "Investigación", render: (r) => r.label },
+            { key: "code", header: t("indicators.code"), render: (r) => <code>{r.code}</code> },
+            { key: "label", header: t("indicators.investigation"), render: (r) => r.label },
           ]}
         />
       )}
 
-      <h2 style={{ fontSize: 17, marginTop: 32 }}>Clasificación de medicación psicotrópica (M05)</h2>
-      {medication.loading && <p>Cargando…</p>}
+      <SectionTitle>{t("indicators.medTitle")}</SectionTitle>
+      {medication.loading && <p>{t("app.loading")}</p>}
       {!medication.loading && !medication.error && (
         <DataTable
           rows={medication.data}
-          emptyMessage="No hay clases de medicación configuradas."
+          emptyMessage={t("indicators.medEmpty")}
           columns={[
-            { key: "code", header: "Código", render: (r) => r.code },
-            { key: "label", header: "Clase / ruta", render: (r) => r.label },
+            { key: "code", header: t("indicators.code"), render: (r) => <code>{r.code}</code> },
+            { key: "label", header: t("indicators.medClass"), render: (r) => r.label },
           ]}
         />
       )}
 
-      {loading && <p style={{ marginTop: 16, color: brandTokens.colors.textSecondary }}>Actualizando…</p>}
+      {loading && <p style={{ marginTop: 16, color: brandTokens.colors.textSecondary }}>{t("app.refreshing")}</p>}
     </section>
   );
 }

@@ -1,0 +1,164 @@
+{
+  "app": {
+    "name": "AEGIS",
+    "tagline": "Clinical Governance Platform by Alkalma Health",
+    "devBanner": "Local mode without authentication — do not use in production",
+    "loading": "Loading…",
+    "refreshing": "Refreshing…",
+    "errorLoadStatus": "Could not load data (HTTP {{status}}).",
+    "errorLoad": "Could not load data.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "activeF": "Active",
+    "inactiveF": "Inactive",
+    "yes": "Yes",
+    "no": "No",
+    "none": "—",
+    "language": "Language"
+  },
+  "nav": {
+    "governance": "Clinical governance",
+    "admin": "Administration (M01–M02)",
+    "uccaCycles": "UCCA — Cycles",
+    "indicators": "Indicators to assess",
+    "users": "Users",
+    "facilities": "Facilities",
+    "professions": "Professions",
+    "specialties": "Specialties",
+    "roles": "AEGIS roles",
+    "professionals": "Professionals"
+  },
+  "login": {
+    "welcome": "Welcome",
+    "subtitle": "Private access for the Alkalma Health clinical governance team.",
+    "email": "Corporate email",
+    "password": "Password",
+    "submit": "Sign in",
+    "error": "Could not sign in. Please check your credentials."
+  },
+  "profile": {
+    "menu": "User profile",
+    "roles": "Roles",
+    "facilities": "Facilities",
+    "corporate": "Corporate scope",
+    "logout": "Sign out",
+    "devUser": "Development user"
+  },
+  "ucca": {
+    "title": "UCCA — Audit cycles",
+    "subtitle": "M04 — Universal Clinical Competency Audit (cycles per facility and period)",
+    "period": "Period",
+    "status": "Status",
+    "facility": "Facility",
+    "actions": "Actions",
+    "evaluate": "Assess criteria",
+    "empty": "No audit cycles recorded yet.",
+    "loadingCycles": "Loading cycles…",
+    "cycleMissing": "Cycle not specified.",
+    "cycleNotFound": "Cycle not found.",
+    "evaluateTitle": "Assess criteria — {{period}}",
+    "evaluateSubtitle": "Facility: {{facility}} · M04 UCCA — record compliance per professional and criterion",
+    "back": "Back to cycles",
+    "formTitle": "Record assessment",
+    "criterion": "Criterion / indicator",
+    "professional": "Professional (physicians at the facility)",
+    "noPhysicians": "No physicians at this facility",
+    "outcome": "Outcome",
+    "naReason": "Reason for \"Not applicable\" (required)",
+    "evidence": "Evidence reference (optional)",
+    "evidencePlaceholder": "e.g. record #12345, clinical note dated 2026-08-01",
+    "submit": "Record assessment",
+    "saving": "Saving…",
+    "saved": "Assessment recorded for {{code}}.",
+    "saveError": "Could not record the assessment.",
+    "resultsTitle": "Assessments recorded in this cycle",
+    "resultsEmpty": "No assessments in this cycle yet.",
+    "loadingResults": "Loading results…",
+    "colCriterion": "Criterion",
+    "colProfessional": "Professional",
+    "colOutcome": "Outcome",
+    "colStatus": "Status",
+    "colEvidence": "Evidence",
+    "outcomes": {
+      "compliant": "Compliant",
+      "non_compliant": "Non-compliant",
+      "not_applicable": "Not applicable"
+    },
+    "statuses": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "approved": "Approved",
+      "open": "Open",
+      "closed": "Closed"
+    }
+  },
+  "indicators": {
+    "title": "Indicators to assess",
+    "subtitle": "M04 UCCA + M05 JAWDA/OMH001 — versioned criteria of the current template and regulatory catalogs",
+    "uccaTitle": "UCCA — Audit criteria (current template)",
+    "uccaLoading": "Loading UCCA criteria…",
+    "uccaEmpty": "No UCCA criteria configured.",
+    "code": "Code",
+    "criterion": "Indicator / criterion",
+    "severity": "Severity",
+    "omhTitle": "OMH001 — Required investigations (antipsychotics)",
+    "omhEmpty": "No OMH001 investigations configured.",
+    "investigation": "Investigation",
+    "medTitle": "Psychotropic medication classification (M05)",
+    "medEmpty": "No medication classes configured.",
+    "medClass": "Class / pathway",
+    "severities": { "critical": "Critical", "major": "Major", "standard": "Standard" }
+  },
+  "admin": {
+    "users": {
+      "title": "Users",
+      "subtitle": "M01 — User, organisation and access management (functional requirement §7)",
+      "empty": "No users recorded.",
+      "name": "Name",
+      "email": "Email",
+      "status": "Status"
+    },
+    "facilities": {
+      "title": "Facilities",
+      "subtitle": "M02 — Alkalma facilities (Al Bateen, Al Falah, …)",
+      "empty": "No facilities recorded.",
+      "name": "Facility",
+      "city": "City",
+      "country": "Country",
+      "status": "Status"
+    },
+    "professions": {
+      "title": "Professions",
+      "subtitle": "M02 — Clinical professions for UCCA/JAWDA criteria and scope of practice",
+      "empty": "No professions recorded.",
+      "name": "Profession",
+      "status": "Status"
+    },
+    "specialties": {
+      "title": "Specialties",
+      "subtitle": "M02 — Clinical specialty catalog (configurable, can be enabled/disabled)",
+      "empty": "No specialties recorded.",
+      "code": "Code",
+      "name": "Specialty",
+      "status": "Status"
+    },
+    "roles": {
+      "title": "AEGIS roles",
+      "subtitle": "M01 — Functional roles (System Administrator, Medical Director, Auditor, …)",
+      "empty": "No roles recorded.",
+      "role": "Role",
+      "code": "Code",
+      "system": "System"
+    },
+    "professionals": {
+      "title": "Professionals",
+      "subtitle": "M02 — Single registry of clinical professionals linked to facilities and professions",
+      "empty": "No professionals recorded.",
+      "name": "Name",
+      "employee": "Employee no.",
+      "profession": "Profession",
+      "specialty": "Specialty",
+      "status": "Status"
+    }
+  }
+}

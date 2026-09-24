@@ -1,0 +1,164 @@
+{
+  "app": {
+    "name": "AEGIS",
+    "tagline": "Clinical Governance Platform by Alkalma Health",
+    "devBanner": "Modo local sin autenticación — no usar en producción",
+    "loading": "Cargando…",
+    "refreshing": "Actualizando…",
+    "errorLoadStatus": "No fue posible cargar los datos (HTTP {{status}}).",
+    "errorLoad": "No fue posible cargar los datos.",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "activeF": "Activa",
+    "inactiveF": "Inactiva",
+    "yes": "Sí",
+    "no": "No",
+    "none": "—",
+    "language": "Idioma"
+  },
+  "nav": {
+    "governance": "Gobierno clínico",
+    "admin": "Administración (M01–M02)",
+    "uccaCycles": "UCCA — Ciclos",
+    "indicators": "Indicadores a evaluar",
+    "users": "Usuarios",
+    "facilities": "Centros médicos",
+    "professions": "Profesiones",
+    "specialties": "Especialidades",
+    "roles": "Roles AEGIS",
+    "professionals": "Profesionales"
+  },
+  "login": {
+    "welcome": "Bienvenido",
+    "subtitle": "Acceso privado para el equipo de gobierno clínico de Alkalma Health.",
+    "email": "Correo corporativo",
+    "password": "Contraseña",
+    "submit": "Ingresar",
+    "error": "No fue posible iniciar sesión. Verifique sus credenciales."
+  },
+  "profile": {
+    "menu": "Perfil de usuario",
+    "roles": "Roles",
+    "facilities": "Centros",
+    "corporate": "Alcance corporativo",
+    "logout": "Cerrar sesión",
+    "devUser": "Usuario de desarrollo"
+  },
+  "ucca": {
+    "title": "UCCA — Ciclos de auditoría",
+    "subtitle": "M04 — Universal Clinical Competency Audit (ciclos por centro y periodo)",
+    "period": "Periodo",
+    "status": "Estado",
+    "facility": "Centro",
+    "actions": "Acciones",
+    "evaluate": "Evaluar criterios",
+    "empty": "No hay ciclos de auditoría registrados todavía.",
+    "loadingCycles": "Cargando ciclos…",
+    "cycleMissing": "Ciclo no especificado.",
+    "cycleNotFound": "Ciclo no encontrado.",
+    "evaluateTitle": "Evaluar criterios — {{period}}",
+    "evaluateSubtitle": "Centro: {{facility}} · M04 UCCA — registrar cumplimiento por profesional y criterio",
+    "back": "Volver a ciclos",
+    "formTitle": "Registrar evaluación",
+    "criterion": "Criterio / indicador",
+    "professional": "Profesional (médicos del centro)",
+    "noPhysicians": "No hay médicos en este centro",
+    "outcome": "Resultado",
+    "naReason": "Razón de \"No aplica\" (obligatorio)",
+    "evidence": "Referencia de evidencia (opcional)",
+    "evidencePlaceholder": "Ej. expediente #12345, nota clínica del 2026-08-01",
+    "submit": "Registrar evaluación",
+    "saving": "Guardando…",
+    "saved": "Evaluación registrada para {{code}}.",
+    "saveError": "No fue posible registrar la evaluación.",
+    "resultsTitle": "Evaluaciones registradas en este ciclo",
+    "resultsEmpty": "Aún no hay evaluaciones en este ciclo.",
+    "loadingResults": "Cargando resultados…",
+    "colCriterion": "Criterio",
+    "colProfessional": "Profesional",
+    "colOutcome": "Resultado",
+    "colStatus": "Estado",
+    "colEvidence": "Evidencia",
+    "outcomes": {
+      "compliant": "Cumple",
+      "non_compliant": "No cumple",
+      "not_applicable": "No aplica"
+    },
+    "statuses": {
+      "draft": "Borrador",
+      "submitted": "Enviado",
+      "approved": "Aprobado",
+      "open": "Abierto",
+      "closed": "Cerrado"
+    }
+  },
+  "indicators": {
+    "title": "Indicadores a evaluar",
+    "subtitle": "M04 UCCA + M05 JAWDA/OMH001 — criterios versionados de la plantilla vigente y catálogos regulatorios",
+    "uccaTitle": "UCCA — Criterios de auditoría (plantilla vigente)",
+    "uccaLoading": "Cargando criterios UCCA…",
+    "uccaEmpty": "No hay criterios UCCA configurados.",
+    "code": "Código",
+    "criterion": "Indicador / criterio",
+    "severity": "Severidad",
+    "omhTitle": "OMH001 — Investigaciones requeridas (antipsicóticos)",
+    "omhEmpty": "No hay investigaciones OMH001 configuradas.",
+    "investigation": "Investigación",
+    "medTitle": "Clasificación de medicación psicotrópica (M05)",
+    "medEmpty": "No hay clases de medicación configuradas.",
+    "medClass": "Clase / ruta",
+    "severities": { "critical": "Crítica", "major": "Mayor", "standard": "Estándar" }
+  },
+  "admin": {
+    "users": {
+      "title": "Usuarios",
+      "subtitle": "M01 — Gestión de usuarios, organización y accesos (requerimiento funcional §7)",
+      "empty": "No hay usuarios registrados.",
+      "name": "Nombre",
+      "email": "Correo",
+      "status": "Estado"
+    },
+    "facilities": {
+      "title": "Centros médicos",
+      "subtitle": "M02 — Facilities / centros de Alkalma (Al Bateen, Al Falah, …)",
+      "empty": "No hay centros registrados.",
+      "name": "Centro",
+      "city": "Ciudad",
+      "country": "País",
+      "status": "Estado"
+    },
+    "professions": {
+      "title": "Profesiones",
+      "subtitle": "M02 — Profesiones clínicas para criterios UCCA/JAWDA y alcance de práctica",
+      "empty": "No hay profesiones registradas.",
+      "name": "Profesión",
+      "status": "Estado"
+    },
+    "specialties": {
+      "title": "Especialidades",
+      "subtitle": "M02 — Catálogo de especialidades clínicas (configurables, activables/desactivables)",
+      "empty": "No hay especialidades registradas.",
+      "code": "Código",
+      "name": "Especialidad",
+      "status": "Estado"
+    },
+    "roles": {
+      "title": "Roles AEGIS",
+      "subtitle": "M01 — Roles funcionales (System Administrator, Medical Director, Auditor, …)",
+      "empty": "No hay roles registrados.",
+      "role": "Rol",
+      "code": "Código",
+      "system": "Sistema"
+    },
+    "professionals": {
+      "title": "Profesionales",
+      "subtitle": "M02 — Registro único de profesionales clínicos vinculados a centros y profesiones",
+      "empty": "No hay profesionales registrados.",
+      "name": "Nombre",
+      "employee": "N.º empleado",
+      "profession": "Profesión",
+      "specialty": "Especialidad",
+      "status": "Estado"
+    }
+  }
+}

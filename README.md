@@ -145,7 +145,9 @@ del seed y la UI muestra una franja de advertencia. **Nunca** habilitar en stagi
 | Motor de reglas desacoplado y reproducible (§8) | `rules_engine/engine.py` + `rulesets/omh001_example.py` |
 | Job semanal que falla ruidosamente (§9) | `jobs/scheduler.py`, `jobs/weekly_antipsychotic_report.py` (esqueleto) |
 | Identidad desacoplada del proveedor de auth para SSO futuro (§6.1) | `identity/models.py::User.auth_provider / external_id` |
-| Branding por tokens centralizados (§10) | `frontend/src/theme/brand-tokens.ts`, `branding/` |
+| Branding por tokens centralizados (§10) | `frontend/src/theme/brand-tokens.ts`, `branding/` (paleta oficial Alkalma, Montserrat) |
+| Interfaz bilingüe ES/EN | `frontend/src/i18n/` (react-i18next; toggle en header, persistido en localStorage) |
+| Perfil del usuario autenticado en header | `GET /identity/me` → `frontend/src/components/ProfileMenu.tsx` |
 
 ## Supuestos de este arquetipo (a validar con el equipo)
 

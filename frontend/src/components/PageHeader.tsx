@@ -7,10 +7,10 @@ type PageHeaderProps = {
 
 export function PageHeader({ title, subtitle }: PageHeaderProps) {
   return (
-    <header style={{ marginBottom: 20 }}>
-      <h1 style={{ fontSize: 22, margin: 0, color: brandTokens.colors.textPrimary }}>{title}</h1>
+    <header style={{ marginBottom: 28 }}>
+      <h1 style={{ fontSize: 28, fontWeight: 500, color: brandTokens.colors.textPrimary }}>{title}</h1>
       {subtitle && (
-        <p style={{ margin: "6px 0 0", fontSize: 14, color: brandTokens.colors.textSecondary }}>
+        <p style={{ margin: "8px 0 0", fontSize: 14, color: brandTokens.colors.textSecondary, maxWidth: 760 }}>
           {subtitle}
         </p>
       )}
