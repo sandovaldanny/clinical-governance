@@ -18,6 +18,10 @@ def _uuid() -> uuid.UUID:
     return uuid.uuid4()
 
 
+USER_STATUSES = ("active", "inactive", "suspended")
+FACILITY_STATUSES = ("active", "closed")
+
+
 class Facility(Base):
     __tablename__ = "facilities"
 
@@ -25,7 +29,10 @@ class Facility(Base):
     name: Mapped[str] = mapped_column(String(200), nullable=False)
     city: Mapped[str] = mapped_column(String(120), nullable=False)
     country: Mapped[str] = mapped_column(String(120), nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    # Director clínico responsable (M01 doc, tabla Facilities: "Clinical Director — User Lookup").
+    clinical_director_user_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"))
+    status: Mapped[str] = mapped_column(String(20), default="active")  # active | closed
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # derivado de status
 
 
 class Profession(Base):
@@ -41,6 +48,7 @@ class OrganizationalPosition(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=_uuid)
     title: Mapped[str] = mapped_column(String(150), nullable=False)
+    description: Mapped[str] = mapped_column(String(300), default="")
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
@@ -53,7 +61,9 @@ class AegisRole(Base):
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=_uuid)
     code: Mapped[str] = mapped_column(String(80), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(150), nullable=False)
+    description: Mapped[str] = mapped_column(String(300), default="")
     is_system_defined: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
 class Permission(Base):
@@ -63,6 +73,8 @@ class Permission(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=_uuid)
     code: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
+    module: Mapped[str] = mapped_column(String(50), default="")  # prefijo del código, ej. "ucca"
+    name: Mapped[str] = mapped_column(String(150), default="")
     description: Mapped[str] = mapped_column(String(300), default="")
 
 
@@ -79,8 +91,11 @@ class User(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=_uuid)
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    first_name: Mapped[str | None] = mapped_column(String(120))
+    last_name: Mapped[str | None] = mapped_column(String(120))
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)  # calculado: first + last
     employee_number: Mapped[str | None] = mapped_column(String(50))
+    mobile: Mapped[str | None] = mapped_column(String(40))
 
     # Desacopla identidad de mecanismo de autenticación: activar SSO con Entra ID no requiere
     # migrar usuarios existentes, solo crear un nuevo auth_provider.
@@ -90,7 +105,8 @@ class User(Base):
 
     must_change_password: Mapped[bool] = mapped_column(Boolean, default=True)
     mfa_enabled: Mapped[bool] = mapped_column(Boolean, default=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    status: Mapped[str] = mapped_column(String(20), default="active")  # active | inactive | suspended
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)  # derivado: status == "active"
 
     profession_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("professions.id"))
     organizational_position_id: Mapped[uuid.UUID | None] = mapped_column(
@@ -98,6 +114,7 @@ class User(Base):
     )
 
     created_at: Mapped["DateTime"] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_by_user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     last_login_at: Mapped["DateTime | None"] = mapped_column(DateTime(timezone=True))
     failed_login_attempts: Mapped[int] = mapped_column(default=0)
 

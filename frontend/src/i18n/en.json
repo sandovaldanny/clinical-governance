@@ -14,7 +14,22 @@
     "yes": "Yes",
     "no": "No",
     "none": "—",
-    "language": "Language"
+    "language": "Language",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "edit": "Edit",
+    "copy": "Copy",
+    "copied": "Copied",
+    "required": "Required",
+    "saveError": "Could not save.",
+    "saving": "Saving…",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended",
+      "closed": "Closed"
+    }
   },
   "nav": {
     "governance": "Clinical governance",
@@ -25,7 +40,8 @@
     "facilities": "Facilities",
     "professions": "Professions",
     "specialties": "Specialties",
-    "roles": "AEGIS roles"
+    "roles": "AEGIS roles",
+    "positions": "Positions"
   },
   "login": {
     "welcome": "Welcome",

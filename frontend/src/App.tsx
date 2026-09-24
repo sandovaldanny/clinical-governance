@@ -21,7 +21,7 @@ export function App() {
   return (
     <Routes>
       <Route element={<AppShell />}>
-        <Route index element={<Navigate to="/ucca" replace />} />
+        <Route index element={<Navigate to="/admin/users" replace />} />
         <Route path="/ucca" element={<UccaDashboard />} />
         <Route path="/ucca/cycles/:cycleId/evaluate" element={<UccaEvaluatePage />} />
         <Route path="/indicators" element={<IndicatorsPage />} />

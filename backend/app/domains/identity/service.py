@@ -26,6 +26,21 @@ from app.domains.identity.models import (
 )
 
 
+def _apply_changes(obj, data: dict) -> tuple[dict, dict]:
+    """Asigna solo los campos presentes en `data` y devuelve (previos, nuevos) de los que cambiaron,
+    listos para record_event. Los valores se normalizan a str para el JSON del audit ledger."""
+    previous: dict = {}
+    new: dict = {}
+    for field, value in data.items():
+        current = getattr(obj, field)
+        if current == value:
+            continue
+        previous[field] = str(current) if current is not None else None
+        new[field] = str(value) if value is not None else None
+        setattr(obj, field, value)
+    return previous, new
+
+
 def authenticate(db: Session, *, email: str, password: str) -> User | None:
     user = db.scalar(select(User).where(User.email == email, User.is_active.is_(True)))
     if not user or not user.hashed_password:

@@ -14,7 +14,22 @@
     "yes": "Sí",
     "no": "No",
     "none": "—",
-    "language": "Idioma"
+    "language": "Idioma",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "edit": "Editar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "required": "Obligatorio",
+    "saveError": "No fue posible guardar.",
+    "saving": "Guardando…",
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "suspended": "Suspendido",
+      "closed": "Cerrado"
+    }
   },
   "nav": {
     "governance": "Gobierno clínico",
@@ -25,7 +40,8 @@
     "facilities": "Centros médicos",
     "professions": "Profesiones",
     "specialties": "Especialidades",
-    "roles": "Roles AEGIS"
+    "roles": "Roles AEGIS",
+    "positions": "Cargos"
   },
   "login": {
     "welcome": "Bienvenido",

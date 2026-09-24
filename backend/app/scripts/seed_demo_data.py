@@ -52,6 +52,13 @@ PROFESSIONS = [
     "Clinical Pharmacist",
     "Social Worker",
     "Occupational Therapist",
+    # Documento M01 (tabla Professions)
+    "Psychiatry",
+    "Psychology",
+    "Occupational Therapy",
+    "Speech & Language Therapy",
+    "Nursing",
+    "Administration",
 ]
 
 ORGANIZATIONAL_POSITIONS = [
@@ -61,6 +68,14 @@ ORGANIZATIONAL_POSITIONS = [
     "Staff Clinician",
     "Chief Nursing Officer",
     "Clinical Auditor",
+    # Documento M01 (tabla Organizational Positions)
+    "Group Medical Director",
+    "Clinical Director",
+    "Consultant Psychiatrist",
+    "Psychologist",
+    "Occupational Therapist",
+    "Speech & Language Therapist",
+    "Administrator",
 ]
 
 SPECIALTIES = [
@@ -98,6 +113,7 @@ PERMISSIONS = [
     ("reports.publish", "Publicar reportes"),
     ("reports.view", "Consultar reportes"),
     ("audit.read", "Consultar audit trail"),
+    ("roles.manage", "Administrar roles y matriz de permisos"),
 ]
 
 ROLE_PERMISSIONS: dict[str, list[str]] = {
@@ -141,6 +157,10 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
 }
 
 CATALOG_ENTRIES: list[tuple[str, str, str]] = [
+    # country / city (M01 doc: dropdowns en Facilities)
+    ("country", "UAE", "United Arab Emirates"),
+    ("city", "abu_dhabi", "Abu Dhabi"),
+    ("city", "dubai", "Dubai"),
     # severity
     ("severity", "standard", "Estándar"),
     ("severity", "major", "Mayor"),
@@ -362,7 +382,7 @@ def _get_or_create_permission(db: Session, code: str, description: str) -> Permi
     row = db.scalar(select(Permission).where(Permission.code == code))
     if row:
         return row
-    row = Permission(code=code, description=description)
+    row = Permission(code=code, module=code.split(".")[0], name=code, description=description)
     db.add(row)
     db.flush()
     return row
