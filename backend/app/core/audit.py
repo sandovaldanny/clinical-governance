@@ -8,6 +8,7 @@ solo puede fallar al insertar, nunca corromper lo ya escrito.
 """
 from __future__ import annotations
 
+import json
 from datetime import datetime, timezone
 
 from sqlalchemy import text
@@ -44,8 +45,9 @@ def record_event(
             "entity_type": entity_type,
             "entity_id": entity_id,
             "action": action,
-            "previous_values": previous_values,
-            "new_values": new_values,
+            # text() no tipa los binds: psycopg no adapta dict, así que serializamos aquí.
+            "previous_values": json.dumps(previous_values) if previous_values is not None else None,
+            "new_values": json.dumps(new_values) if new_values is not None else None,
             "is_retrospective": is_retrospective,
         },
     )
