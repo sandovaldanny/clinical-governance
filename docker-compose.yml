@@ -10,9 +10,11 @@ services:
       - "5432:5432"
     volumes:
       - aegis_db_data:/var/lib/postgresql/data
+      # Rol de aplicación restringido (aegis_app) — ver infra/postgres/README.md
+      - ./infra/postgres/init:/docker-entrypoint-initdb.d:ro
 
   backend:
-    build: ./apps/backend
+    build: ./backend
     restart: unless-stopped
     env_file: .env
     depends_on:
@@ -20,17 +22,17 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./apps/backend:/app
+      - ./backend:/app
 
   frontend:
-    build: ./apps/frontend
+    build: ./frontend
     restart: unless-stopped
     depends_on:
       - backend
     ports:
       - "5173:5173"
     volumes:
-      - ./apps/frontend:/app
+      - ./frontend:/app
       - /app/node_modules
 
 volumes:
