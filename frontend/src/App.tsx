@@ -5,7 +5,6 @@ import { LoginPage } from "./auth/LoginPage";
 import { useAuth } from "./auth/AuthContext";
 import { AUTH_DISABLED } from "./api/client";
 import { FacilitiesPage } from "./modules/admin/FacilitiesPage";
-import { ProfessionalsPage } from "./modules/admin/ProfessionalsPage";
 import { ProfessionsPage } from "./modules/admin/ProfessionsPage";
 import { RolesPage } from "./modules/admin/RolesPage";
 import { SpecialtiesPage } from "./modules/admin/SpecialtiesPage";
@@ -31,7 +30,6 @@ export function App() {
         <Route path="/admin/professions" element={<ProfessionsPage />} />
         <Route path="/admin/specialties" element={<SpecialtiesPage />} />
         <Route path="/admin/roles" element={<RolesPage />} />
-        <Route path="/admin/professionals" element={<ProfessionalsPage />} />
       </Route>
     </Routes>
   );

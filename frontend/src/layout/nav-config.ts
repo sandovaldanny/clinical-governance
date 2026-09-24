@@ -26,7 +26,6 @@ export const NAV_GROUPS: NavGroup[] = [
       { labelKey: "nav.professions", path: "/admin/professions" },
       { labelKey: "nav.specialties", path: "/admin/specialties" },
       { labelKey: "nav.roles", path: "/admin/roles" },
-      { labelKey: "nav.professionals", path: "/admin/professionals" },
     ],
   },
 ];

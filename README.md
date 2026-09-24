@@ -39,7 +39,7 @@ Incidentes, Quejas, CME, Inteligencia Ejecutiva) se agrega siguiendo el mismo pa
 │       ├── layout/          #   AppShell, Sidebar, nav-config por módulo
 │       ├── components/      #   DataTable, PageHeader
 │       ├── hooks/           #   useApiList
-│       └── modules/         #   admin (M01/M02), indicators (M04/M05), ucca (M04)
+│       └── modules/         #   admin (M01/M02: usuarios, centros, profesiones, especialidades, roles), indicators, ucca
 ├── infra/                   # infraestructura local: init SQL de Postgres (rol aegis_app restringido)
 ├── branding/                # identidad Alkalma: guía de tokens, logo placeholder, insumos pendientes
 ├── docs/                    # requerimiento funcional, arquitectura técnica, specs/planes de proceso
