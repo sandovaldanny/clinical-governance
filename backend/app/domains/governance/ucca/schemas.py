@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class AuditCycleCreateRequest(BaseModel):
@@ -17,8 +17,7 @@ class AuditCycleOut(BaseModel):
     period_label: str
     status: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AuditResultCreateRequest(BaseModel):
@@ -40,8 +39,7 @@ class AuditResultOut(BaseModel):
     evidence_reference: str | None = None
     not_applicable_reason: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AuditResultDetailOut(BaseModel):
@@ -66,5 +64,4 @@ class AuditCriterionOut(BaseModel):
     severity: str
     template_version_id: uuid.UUID
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

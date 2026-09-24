@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import uuid
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class LoginRequest(BaseModel):
@@ -31,8 +31,7 @@ class UserOut(BaseModel):
     full_name: str
     is_active: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class FacilityOut(BaseModel):
@@ -42,8 +41,7 @@ class FacilityOut(BaseModel):
     country: str
     is_active: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProfessionOut(BaseModel):
@@ -51,8 +49,7 @@ class ProfessionOut(BaseModel):
     name: str
     is_active: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class RoleOut(BaseModel):
@@ -61,8 +58,7 @@ class RoleOut(BaseModel):
     name: str
     is_system_defined: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ProfessionalOut(BaseModel):
@@ -83,5 +79,4 @@ class CatalogValueOut(BaseModel):
     label: str
     is_active: bool
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

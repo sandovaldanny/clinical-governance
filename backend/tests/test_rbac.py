@@ -1,12 +1,24 @@
 """
 Prueba de referencia: un usuario sin el permiso requerido debe ser rechazado por el middleware
 de autorización, no por lógica ad hoc dentro del router del módulo.
+
+La prueba fuerza AUTH_DISABLED=false para no depender del .env local del desarrollador
+(el bypass de desarrollo devolvería siempre al usuario sin validar permisos).
 """
 from fastapi import HTTPException
 import pytest
 
+from app.core.config import get_settings
 from app.core.deps import CurrentUser
 from app.core.rbac import require_permission
+
+
+@pytest.fixture(autouse=True)
+def _auth_enabled(monkeypatch):
+    monkeypatch.setenv("AUTH_DISABLED", "false")
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 def _user_with(permissions: set[str]) -> CurrentUser:
