@@ -160,3 +160,27 @@ def list_catalog_values(db: Session, *, catalog_type: str | None = None) -> list
     if catalog_type:
         stmt = stmt.where(CatalogValue.catalog_type == catalog_type)
     return list(db.scalars(stmt).all())
+
+
+def get_profile(db: Session, *, user_id: uuid.UUID) -> dict:
+    """Nombre, roles y centros del usuario para el menú de perfil. Tolera que no exista fila
+    (usuario dev del bypass local): devuelve listas vacías y nombre None."""
+    user = db.scalar(select(User).where(User.id == user_id))
+    role_names = db.scalars(
+        select(AegisRole.name)
+        .join(UserRoleAssignment, UserRoleAssignment.role_id == AegisRole.id)
+        .where(UserRoleAssignment.user_id == user_id)
+        .order_by(AegisRole.name)
+    ).all()
+    facility_names = db.scalars(
+        select(Facility.name)
+        .join(UserFacilityAssignment, UserFacilityAssignment.facility_id == Facility.id)
+        .where(UserFacilityAssignment.user_id == user_id)
+        .order_by(Facility.name)
+    ).all()
+    return {
+        "full_name": user.full_name if user else None,
+        "email": user.email if user else None,
+        "roles": list(role_names),
+        "facilities": list(facility_names),
+    }

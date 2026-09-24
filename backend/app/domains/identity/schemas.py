@@ -80,3 +80,15 @@ class CatalogValueOut(BaseModel):
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class CurrentUserOut(BaseModel):
+    """Perfil del usuario autenticado para el encabezado/menú de perfil del frontend."""
+
+    id: str
+    email: str
+    full_name: str
+    roles: list[str]
+    facilities: list[str]
+    is_corporate: bool
+    permissions: list[str]

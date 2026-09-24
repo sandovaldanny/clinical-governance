@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
-from app.core.deps import CurrentUser
+from app.core.deps import CurrentUser, get_current_user
 from app.core.rbac import require_permission
 from app.core.security import create_access_token
 from app.domains.identity import schemas, service
@@ -33,6 +33,25 @@ def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)) -> schem
         },
     )
     return schemas.TokenResponse(access_token=token, must_change_password=user.must_change_password)
+
+
+@router.get("/me", response_model=schemas.CurrentUserOut)
+def me(
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(get_current_user),
+) -> schemas.CurrentUserOut:
+    """Perfil del usuario autenticado. Solo requiere sesión válida, no un permiso específico."""
+    profile = service.get_profile(db, user_id=uuid.UUID(current_user.id))
+    email = profile["email"] or current_user.email
+    return schemas.CurrentUserOut(
+        id=current_user.id,
+        email=email,
+        full_name=profile["full_name"] or email,
+        roles=profile["roles"],
+        facilities=profile["facilities"],
+        is_corporate=current_user.is_corporate,
+        permissions=sorted(current_user.effective_permissions),
+    )
 
 
 @router.get("/facilities", response_model=list[schemas.FacilityOut])
