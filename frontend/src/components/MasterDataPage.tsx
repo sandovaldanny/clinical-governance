@@ -37,7 +37,7 @@ export type FieldSpec = {
   fixed?: string;
 };
 
-export type ColumnSpec<T> = { key: string; headerKey: string; render: (row: T) => ReactNode };
+export type ColumnSpec<T> = { key: string; headerKey: string; render: (row: T) => ReactNode; width?: number | string };
 
 export type StatusSpec =
   | { kind: "toggle"; field: "is_active" }
@@ -174,6 +174,7 @@ export function MasterDataPage<T extends { id: string }>(props: MasterDataPagePr
   const statusColumn: ColumnSpec<T> = {
     key: "__status",
     headerKey: "app.statusLabel",
+    width: 130,
     render: (row) => {
       const r = row as unknown as Record<string, unknown>;
       if (props.status.kind === "toggle") {
@@ -223,6 +224,7 @@ export function MasterDataPage<T extends { id: string }>(props: MasterDataPagePr
   const editColumn: ColumnSpec<T> = {
     key: "__edit",
     headerKey: "",
+    width: 72,
     render: (row) =>
       canManage ? (
         <button type="button" className="btn-ghost" style={{ padding: "4px 10px", fontSize: 12 }} onClick={() => openEdit(row)}>
@@ -258,6 +260,7 @@ export function MasterDataPage<T extends { id: string }>(props: MasterDataPagePr
           columns={[...props.columns, statusColumn, editColumn].map((c) => ({
             key: c.key,
             header: c.headerKey ? t(c.headerKey) : "",
+            width: c.width,
             render: (row: T & { __muted: boolean }) => (
               <span style={{ color: row.__muted && c.key !== "__status" ? brandTokens.colors.textSecondary : undefined }}>
                 {c.render(row)}

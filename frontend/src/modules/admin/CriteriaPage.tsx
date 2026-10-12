@@ -11,6 +11,27 @@ type Criterion = {
   is_active: boolean;
 };
 
+/** Texto largo recortado a 2 líneas; el texto completo va en el tooltip. Evita que la tabla
+ * crezca o necesite scroll horizontal. */
+function Clamped({ text, muted }: { text: string; muted?: boolean }) {
+  return (
+    <span
+      title={text}
+      style={{
+        display: "-webkit-box",
+        WebkitLineClamp: 3,
+        WebkitBoxOrient: "vertical",
+        overflow: "hidden",
+        fontSize: 13,
+        lineHeight: 1.4,
+        color: muted ? brandTokens.colors.textSecondary : undefined,
+      }}
+    >
+      {text || "—"}
+    </span>
+  );
+}
+
 /** Administración → Criterios de evaluación (plantilla UCCA vigente). Mismo patrón que cargos,
  * profesiones y especialidades: tabla + drawer crear/editar + activar/inactivar. */
 export function CriteriaPage() {
@@ -32,15 +53,11 @@ export function CriteriaPage() {
         { key: "examples_evidence", labelKey: "admin.criteria.examplesEvidence", type: "textarea", hintKey: "admin.criteria.examplesEvidenceHint" },
       ]}
       columns={[
-        { key: "code", headerKey: "admin.criteria.code", render: (r) => <code>{r.code}</code> },
-        { key: "domain", headerKey: "admin.criteria.domain", render: (r) => <strong style={{ fontWeight: 500 }}>{r.domain}</strong> },
-        {
-          key: "question",
-          headerKey: "admin.criteria.universalQuestion",
-          render: (r) => (
-            <span style={{ display: "block", maxWidth: 420, color: brandTokens.colors.textSecondary }}>{r.universal_question}</span>
-          ),
-        },
+        { key: "code", headerKey: "admin.criteria.code", width: 64, render: (r) => <code>{r.code}</code> },
+        { key: "domain", headerKey: "admin.criteria.domain", width: 150, render: (r) => <strong style={{ fontWeight: 500, fontSize: 13 }}>{r.domain}</strong> },
+        { key: "question", headerKey: "admin.criteria.universalQuestion", width: "22%", render: (r) => <Clamped text={r.universal_question} /> },
+        { key: "interpretation", headerKey: "admin.criteria.professionInterpretation", width: "22%", render: (r) => <Clamped text={r.profession_interpretation} muted /> },
+        { key: "evidence", headerKey: "admin.criteria.examplesEvidence", width: "22%", render: (r) => <Clamped text={r.examples_evidence} muted /> },
       ]}
       status={{ kind: "toggle", field: "is_active" }}
       rowLabel={(r) => `${r.code} — ${r.domain}`}

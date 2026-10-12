@@ -6,6 +6,8 @@ type Column<T> = {
   key: string;
   header: string;
   render: (row: T) => ReactNode;
+  /** Ancho fijo opcional (px o %). Sin él, el navegador reparte el espacio. */
+  width?: number | string;
 };
 
 type DataTableProps<T> = {
@@ -49,7 +51,8 @@ export function DataTable<T extends { id?: string }>({ columns, rows, emptyMessa
               <th
                 key={col.key}
                 style={{
-                  padding: "14px 18px",
+                  width: col.width,
+                  padding: "14px 16px",
                   fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: "0.04em",
@@ -66,7 +69,7 @@ export function DataTable<T extends { id?: string }>({ columns, rows, emptyMessa
           {rows.map((row, idx) => (
             <tr key={row.id ?? idx} style={{ borderTop: `1px solid ${brandTokens.colors.border}` }}>
               {columns.map((col) => (
-                <td key={col.key} style={{ padding: "14px 18px", fontSize: 14, verticalAlign: "top" }}>
+                <td key={col.key} style={{ padding: "14px 16px", fontSize: 14, verticalAlign: "top" }}>
                   {col.render(row)}
                 </td>
               ))}
