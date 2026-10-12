@@ -10,19 +10,25 @@ Idempotente: puede ejecutarse varias veces sin duplicar registros clave.
 from __future__ import annotations
 
 import uuid
+from datetime import date
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.database import SessionLocal
 from app.core.security import hash_password
+from app.domains.governance.corrective_actions.models import CorrectiveAction
 from app.domains.governance.ucca.models import (
     AuditCriterion,
     AuditCycle,
+    AuditResult,
     AuditTemplate,
     AuditTemplateVersion,
+    ChartAudit,
+    Finding,
 )
+from app.domains.governance.ucca.scoring import compute_score
 from app.domains.identity.models import (
     AegisRole,
     CatalogValue,
@@ -650,33 +656,97 @@ def _seed_ucca_template(db: Session) -> AuditTemplateVersion:
     return version
 
 
+# (MRN, respuestas por código en orden CCA,CRS,CTP,COM,CDC,CEP,CMC) — como la hoja Excel UCCA de
+# referencia: 5 expedientes Compliant y uno con 2 "No" + 1 "N/A" que genera hallazgo y acción.
+DEMO_CHART_AUDITS = [
+    ("102453", ["compliant"] * 7),
+    ("100598", ["compliant"] * 7),
+    ("AKAD00132", ["compliant"] * 7),
+    ("AKAD00264", ["compliant"] * 7),
+    ("101460", ["compliant"] * 7),
+    ("103877", ["compliant", "non_compliant", "compliant", "not_applicable", "compliant", "compliant", "non_compliant"]),
+]
+CRITERIA_CODES = ["CCA", "CRS", "CTP", "COM", "CDC", "CEP", "CMC"]
+
+
+def _get_or_create_cycle(db: Session, facility: Facility, template_version: AuditTemplateVersion, year: int, quarter: str,
+                         created_by: User) -> AuditCycle:
+    cycle = db.scalar(
+        select(AuditCycle).where(AuditCycle.facility_id == facility.id, AuditCycle.year == year, AuditCycle.quarter == quarter)
+    )
+    if cycle:
+        return cycle
+    cycle = AuditCycle(facility_id=facility.id, template_version_id=template_version.id, period_label=f"{quarter}-{year}",
+                       year=year, quarter=quarter, status="draft", created_by_user_id=created_by.id)
+    db.add(cycle)
+    db.flush()
+    return cycle
+
+
 def _seed_sample_cycle(
     db: Session,
     facilities: dict[str, Facility],
     users: dict[str, User],
     template_version: AuditTemplateVersion,
 ) -> None:
+    """Ciclo Q2-2026 (Al Bateen) con 6 expedientes auditados y aprobados del Dr. Ahmed Al Bateen
+    (PRO-101), más el ciclo Q3-2026 vacío. Idempotente: no duplica ciclos ni expedientes."""
     admin = users["admin@alkalma.health"]
+    auditor = users["governance.lead@alkalma.health"]
     facility = facilities["Al Bateen"]
-    exists = db.scalar(
-        select(AuditCycle).where(
-            AuditCycle.facility_id == facility.id,
-            AuditCycle.period_label == "Q3-2026",
-        )
-    )
-    if exists:
+    _get_or_create_cycle(db, facility, template_version, 2026, "Q3", admin)
+    cycle = _get_or_create_cycle(db, facility, template_version, 2026, "Q2", auditor)
+
+    professional = db.scalar(select(Professional).where(Professional.employee_number == "PRO-101"))
+    criteria = {
+        c.code: c
+        for c in db.scalars(select(AuditCriterion).where(AuditCriterion.template_version_id == template_version.id)).all()
+    }
+    if not professional or any(code not in criteria for code in CRITERIA_CODES):
         return
-    db.add(
-        AuditCycle(
-            facility_id=facility.id,
-            template_version_id=template_version.id,
-            period_label="Q3-2026",
-            year=2026,
-            quarter="Q3",
-            status="draft",
-            created_by_user_id=admin.id,
+    for case_ref, outcomes in DEMO_CHART_AUDITS:
+        exists = db.scalar(
+            select(ChartAudit).where(
+                ChartAudit.cycle_id == cycle.id,
+                ChartAudit.professional_id == professional.id,
+                ChartAudit.case_reference == case_ref,
+            )
         )
-    )
+        if exists:
+            continue
+        score = compute_score(outcomes)
+        audit = ChartAudit(
+            cycle_id=cycle.id, facility_id=facility.id, professional_id=professional.id, auditor_user_id=auditor.id,
+            case_reference=case_ref, audit_date=date(2026, 7, 20), status="approved",
+            applicable_count=score.applicable_count, yes_count=score.yes_count, score=score.score,
+            outcome=score.outcome, notes="",
+        )
+        db.add(audit)
+        db.flush()
+        for code, outcome in zip(CRITERIA_CODES, outcomes):
+            db.add(
+                AuditResult(
+                    chart_audit_id=audit.id, facility_id=facility.id, cycle_id=cycle.id, criterion_id=criteria[code].id,
+                    professional_id=professional.id, auditor_user_id=auditor.id, outcome=outcome,
+                    not_applicable_reason="Outcome monitoring not yet due at audit date" if outcome == "not_applicable" else None,
+                    status="approved",
+                )
+            )
+        if score.outcome not in (None, "compliant"):
+            finding = Finding(
+                facility_id=facility.id, chart_audit_id=audit.id,
+                description="Risk documentation and MDT communication incomplete in the audited chart.", status="open",
+            )
+            db.add(finding)
+            db.flush()
+            db.add(
+                CorrectiveAction(
+                    facility_id=facility.id, source_module="ucca", source_finding_id=finding.id,
+                    responsible_user_id=users["md.bateen@alkalma.health"].id, due_date=date(2026, 8, 30),
+                    status="assigned",
+                    description="Refresher on risk assessment documentation; audit 5 further charts in Q3.",
+                )
+            )
 
 
 def run() -> None:
@@ -695,7 +765,7 @@ def run() -> None:
         print("Sembrando plantilla UCCA e indicadores (JAWDA/OMH001)...")
         template_version = _seed_ucca_template(db)
 
-        print("Sembrando ciclo UCCA de ejemplo Q3-2026...")
+        print("Sembrando ciclos UCCA de ejemplo (Q2-2026 con 6 expedientes, Q3-2026 vacío)...")
         _seed_sample_cycle(db, facilities, users, template_version)
 
         db.commit()
@@ -714,6 +784,7 @@ def run() -> None:
         print(f"  Usuarios demo: {len(DEMO_USERS)}")
         print(f"  Profesionales: {len(DEMO_PROFESSIONALS)}")
         print(f"  Criterios de evaluación: {criteria_count}")
+        print(f"  Auditorías de expediente demo: {db.scalar(select(func.count(ChartAudit.id)))}")
         print(f"  Valores de catálogo: {catalog_count}")
         print("\nCredenciales demo (excepto admin):")
         print(f"  Contraseña: {DEMO_PASSWORD}")

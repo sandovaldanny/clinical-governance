@@ -96,7 +96,8 @@ docker compose config --quiet                    # valida el compose
 `seed_demo_data` es idempotente. Carga centros (Al Bateen, Al Falah), profesiones, especialidades,
 cargos, 9 roles con su matriz de permisos, catálogos JAWDA/OMH001 (10 investigaciones, clases de
 medicación), 7 usuarios demo, 3 profesionales, la plantilla UCCA v1 con los 7 criterios de evaluación
-(CCA, CRS, CTP, COM, CDC, CEP, CMC) y un ciclo Q3-2026.
+(CCA, CRS, CTP, COM, CDC, CEP, CMC), un ciclo Q2-2026 en Al Bateen con 6 expedientes auditados
+(5 Compliant, 1 con hallazgo y acción correctiva) y el ciclo Q3-2026 vacío.
 
 | Usuario | Rol | Alcance |
 |---|---|---|
@@ -137,6 +138,20 @@ registrar, editar y activar/inactivar, siempre auditado en `audit_events`:
 | Roles | `GET /identity/permissions`, `GET/POST /identity/roles`, `PATCH …/{id}` | Matriz rol→permiso editable por módulo; System Administrator conserva todos los permisos. Los permisos viajan en el JWT y aplican en el siguiente inicio de sesión. |
 
 Permisos que gobiernan la escritura: `users.manage`, `catalogs.manage`, `facilities.manage`, `roles.manage`.
+
+## UCCA — Auditoría por expediente (M04)
+
+Diseño: `docs/superpowers/specs/2026-10-12-ucca-chart-audit-design.md` · Guía y reglas de evaluación:
+`docs/AEGIS_M04_UCCA_Chart_Audit.md`.
+
+| Pantalla | Endpoints | Notas |
+|---|---|---|
+| UCCA (ciclos) | `GET/POST /ucca/cycles` | Un ciclo por centro + año + trimestre; el drawer sugiere el siguiente trimestre libre del centro. |
+| Página del ciclo | `GET /ucca/cycles/{id}/audits`, `GET /ucca/cycles/{id}/summary` | Tabla tipo Excel: una fila por expediente con Yes/No/N/A por criterio, score y outcome. |
+| Auditar expediente | `POST /ucca/cycles/{id}/audits`, `GET/PATCH /ucca/audits/{id}`, `POST …/submit`, `POST …/approve` | 7 criterios en una pantalla con panel "Reglas de evaluación"; score = Yes / aplicables (N/A excluidos, razón obligatoria); outcome ≥90 Compliant · ≥80 Minor Improvement · ≥70 Improvement Required · <70 Priority Corrective Action. Hallazgo + acción correctiva (M06) en la misma pantalla. Aprobada = inmutable. |
+| Dashboard → UCCA | `GET /ucca/dashboard?facility_id&year&quarter` | Solo auditorías enviadas/aprobadas; % Yes por criterio, por profesional, tendencia por trimestre, acciones abiertas. |
+
+Permisos: `ucca.view` leer · `ucca.create` crear/editar borrador/enviar · `ucca.approve` aprobar.
 
 ## Cómo se agrega un módulo nuevo
 

@@ -1,8 +1,8 @@
 {
   "README.md": {
-    "mtime": 1791795018.1054833,
-    "seen": 1791795109.306893,
-    "ast_hash": "05ef2c66b802ccee207854897a551a01",
+    "mtime": 1791804370.5269818,
+    "seen": 1791804401.821923,
+    "ast_hash": "f196b93705314c8fdc25cb58a8d8ccde",
     "semantic_hash": ""
   },
   "docker-compose.yml": {
@@ -138,9 +138,9 @@
     "semantic_hash": ""
   },
   "backend/app/domains/governance/corrective_actions/models.py": {
-    "mtime": 1788852301.0,
-    "seen": 1790225527.055101,
-    "ast_hash": "7eff7e4114f38ef834a80e6ab859a69d",
+    "mtime": 1791803283.6581633,
+    "seen": 1791804401.820983,
+    "ast_hash": "f3ae2ff5426ed720d861b416f6ca4820",
     "semantic_hash": ""
   },
   "backend/app/domains/governance/ucca/__init__.py": {
@@ -150,27 +150,27 @@
     "semantic_hash": ""
   },
   "backend/app/domains/governance/ucca/models.py": {
-    "mtime": 1791794918.7786071,
-    "seen": 1791795109.306025,
-    "ast_hash": "7243a48266606829df7cf308aa64bf4e",
+    "mtime": 1791803283.657678,
+    "seen": 1791804401.821001,
+    "ast_hash": "50f62e9e98314f6b2aa7cfcecc362c4a",
     "semantic_hash": ""
   },
   "backend/app/domains/governance/ucca/router.py": {
-    "mtime": 1791794918.7795837,
-    "seen": 1791795109.306026,
-    "ast_hash": "c5eb938a1c94d87f8b56ed674472d29d",
+    "mtime": 1791803640.1324735,
+    "seen": 1791804401.821001,
+    "ast_hash": "cd79d331ee077e295faee10043ccb59a",
     "semantic_hash": ""
   },
   "backend/app/domains/governance/ucca/schemas.py": {
-    "mtime": 1791794918.7790074,
-    "seen": 1791795109.306026,
-    "ast_hash": "ad1c53c8ad774731b22833f9a19a0b7b",
+    "mtime": 1791803640.092313,
+    "seen": 1791804401.821002,
+    "ast_hash": "fc1ec2a1d0993701dd28bdb7c9882b2a",
     "semantic_hash": ""
   },
   "backend/app/domains/governance/ucca/service.py": {
-    "mtime": 1791794918.7791858,
-    "seen": 1791795109.306027,
-    "ast_hash": "c44e6da027a37c922efbf3f5e06571d5",
+    "mtime": 1791803679.8068006,
+    "seen": 1791804401.821003,
+    "ast_hash": "c0deeb4ef51182f7ad142a3c85a0ebe1",
     "semantic_hash": ""
   },
   "backend/app/domains/identity/__init__.py": {
@@ -258,9 +258,9 @@
     "semantic_hash": ""
   },
   "backend/app/scripts/seed_demo_data.py": {
-    "mtime": 1791794947.4061918,
-    "seen": 1791795109.306208,
-    "ast_hash": "ab5673f9d2e85ed71655896c9ca8479b",
+    "mtime": 1791804328.0628953,
+    "seen": 1791804401.8212218,
+    "ast_hash": "13c57b8d3e556fa1741addfa4fc666e5",
     "semantic_hash": ""
   },
   "backend/app/scripts/seed_initial_admin.py": {
@@ -306,9 +306,9 @@
     "semantic_hash": ""
   },
   "frontend/src/App.tsx": {
-    "mtime": 1791794984.9598699,
-    "seen": 1791795109.306412,
-    "ast_hash": "0a0064a36aaf17138fcac55bbfc9ddb9",
+    "mtime": 1791803795.756462,
+    "seen": 1791804401.821459,
+    "ast_hash": "327790735da76e3ee17f48bb99293cc1",
     "semantic_hash": ""
   },
   "frontend/src/api/client.ts": {
@@ -330,9 +330,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/DataTable.tsx": {
-    "mtime": 1790226943.5671983,
-    "seen": 1790233885.3358662,
-    "ast_hash": "0dfc722799f1c27c22d6a5c27e480728",
+    "mtime": 1791804189.6996586,
+    "seen": 1791804401.8215091,
+    "ast_hash": "746eade805d902c51ec53767bfe6ad07",
     "semantic_hash": ""
   },
   "frontend/src/components/PageHeader.tsx": {
@@ -354,15 +354,15 @@
     "semantic_hash": ""
   },
   "frontend/src/layout/Sidebar.tsx": {
-    "mtime": 1790226943.4547973,
-    "seen": 1790233885.335875,
-    "ast_hash": "26efc062a9351f3c229506ffaa9257fd",
+    "mtime": 1791803845.2482722,
+    "seen": 1791804401.8217359,
+    "ast_hash": "a67156391b568e63980c139ae34a6447",
     "semantic_hash": ""
   },
   "frontend/src/layout/nav-config.ts": {
-    "mtime": 1791794984.95943,
-    "seen": 1791795109.3067038,
-    "ast_hash": "2eb9b715186653bf80e260e72a7457b9",
+    "mtime": 1791803795.7727668,
+    "seen": 1791804401.821737,
+    "ast_hash": "c749fb3f33113facbc252da42e44aef0",
     "semantic_hash": ""
   },
   "frontend/src/main.tsx": {
@@ -402,21 +402,9 @@
     "semantic_hash": ""
   },
   "frontend/src/modules/indicators/IndicatorsPage.tsx": {
-    "mtime": 1791795003.0491517,
-    "seen": 1791795109.306819,
-    "ast_hash": "8c8f8cb74b73c5a8d6d054d7af1b40dd",
-    "semantic_hash": ""
-  },
-  "frontend/src/modules/ucca/UccaDashboard.tsx": {
-    "mtime": 1790227021.0098286,
-    "seen": 1790233885.33588,
-    "ast_hash": "e7aeb34c62554d2df9b1aed7fbe48561",
-    "semantic_hash": ""
-  },
-  "frontend/src/modules/ucca/UccaEvaluatePage.tsx": {
-    "mtime": 1791795003.0487208,
-    "seen": 1791795109.306837,
-    "ast_hash": "31c455a42a04cc5a964882e1f3bd7d1c",
+    "mtime": 1791802080.0626192,
+    "seen": 1791804401.8218591,
+    "ast_hash": "efc0d865c9275e1e45c9054c502522b4",
     "semantic_hash": ""
   },
   "frontend/src/theme/brand-tokens.ts": {
@@ -474,9 +462,9 @@
     "semantic_hash": ""
   },
   "backend/tests/_fakes.py": {
-    "mtime": 1790232903.554605,
-    "seen": 1790233885.335797,
-    "ast_hash": "67e4d2854785cd0657315d12cfba1d40",
+    "mtime": 1791803495.6363485,
+    "seen": 1791804401.821252,
+    "ast_hash": "f6030eb1b8a84c3a8742163f83e10ccd",
     "semantic_hash": ""
   },
   "backend/tests/test_audit.py": {
@@ -546,9 +534,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/MasterDataPage.tsx": {
-    "mtime": 1791794984.9602122,
-    "seen": 1791795109.3065112,
-    "ast_hash": "8e109c2bb2c0ee853b1209cde081d6a5",
+    "mtime": 1791795348.4761348,
+    "seen": 1791804401.821561,
+    "ast_hash": "c50f806faf41d400fe2a59ff596c451c",
     "semantic_hash": ""
   },
   "frontend/src/components/ProfileMenu.tsx": {
@@ -558,9 +546,9 @@
     "semantic_hash": ""
   },
   "frontend/src/components/StatusBadge.tsx": {
-    "mtime": 1790226943.5758758,
-    "seen": 1790233885.33587,
-    "ast_hash": "484075b0467419420f41470d4e0b86b2",
+    "mtime": 1791803795.7387435,
+    "seen": 1791804401.821593,
+    "ast_hash": "8c63e642250453adf3ad12719c9e8f4c",
     "semantic_hash": ""
   },
   "frontend/src/components/StatusSelect.tsx": {
@@ -600,15 +588,15 @@
     "semantic_hash": ""
   },
   "frontend/src/i18n/en.json": {
-    "mtime": 1791794985.0611856,
-    "seen": 1791795109.3066611,
-    "ast_hash": "7e54180661e940688d6bb0eacff4dbb9",
+    "mtime": 1791804048.594564,
+    "seen": 1791804401.821703,
+    "ast_hash": "21db869f3c390fde92001cf50859f409",
     "semantic_hash": ""
   },
   "frontend/src/i18n/es.json": {
-    "mtime": 1791794985.0609577,
-    "seen": 1791795109.3066618,
-    "ast_hash": "306f3987db53a04f1a3f158ebaa53643",
+    "mtime": 1791804048.5940444,
+    "seen": 1791804401.821704,
+    "ast_hash": "094da417b1b0e653b8668c90f2a99563",
     "semantic_hash": ""
   },
   "frontend/src/i18n/index.ts": {
@@ -678,9 +666,177 @@
     "semantic_hash": ""
   },
   "frontend/src/modules/admin/CriteriaPage.tsx": {
-    "mtime": 1791794984.772048,
-    "seen": 1791795109.306717,
-    "ast_hash": "86456183d86945fbaa71fec68ae15357",
+    "mtime": 1791795348.4763453,
+    "seen": 1791804401.821752,
+    "ast_hash": "d1a92b09f69d225a33edde6736fb1e1b",
+    "semantic_hash": ""
+  },
+  "backend/alembic/versions/0007_ucca_chart_audits.py": {
+    "mtime": 1791803283.6624815,
+    "seen": 1791804401.820788,
+    "ast_hash": "0a08a04cfafd5b6b3a4c5e3124584642",
+    "semantic_hash": ""
+  },
+  "backend/app/domains/governance/ucca/scoring.py": {
+    "mtime": 1791803679.7654853,
+    "seen": 1791804401.821002,
+    "ast_hash": "9f33722b104e195dc9c43f2f9c647523",
+    "semantic_hash": ""
+  },
+  "backend/app/domains/governance/ucca/summary.py": {
+    "mtime": 1791803640.0882328,
+    "seen": 1791804401.821004,
+    "ast_hash": "e44f8bfe5211f2a5ada4cc67b995e35b",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_ucca_chart_audits.py": {
+    "mtime": 1791803663.9740238,
+    "seen": 1791804401.821383,
+    "ast_hash": "17a79b03372a7ed67cb27cbfb97a7e86",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_ucca_cycles_create.py": {
+    "mtime": 1791803524.4663339,
+    "seen": 1791804401.821398,
+    "ast_hash": "c5507949946ce7dcb2e869c4418a37b9",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_ucca_models.py": {
+    "mtime": 1791803235.3966894,
+    "seen": 1791804401.821399,
+    "ast_hash": "a2e90c004c744e5acf373082564ed7f1",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_ucca_scoring.py": {
+    "mtime": 1791803663.93808,
+    "seen": 1791804401.8214002,
+    "ast_hash": "8fd1a410980f78edddcc8ea457b9c422",
+    "semantic_hash": ""
+  },
+  "backend/tests/test_ucca_summary.py": {
+    "mtime": 1791803595.6896646,
+    "seen": 1791804401.8214002,
+    "ast_hash": "70a0050c25077241b3eba8a1d65e6120",
+    "semantic_hash": ""
+  },
+  "frontend/src/hooks/useApiGet.ts": {
+    "mtime": 1791803795.6926117,
+    "seen": 1791804401.821656,
+    "ast_hash": "776858632ed3c4b592c052a30f42e1db",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/aegis/AegisPage.tsx": {
+    "mtime": 1791801912.6502368,
+    "seen": 1791804401.821858,
+    "ast_hash": "58cd64e42e68c71bbbddd75e9f289441",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/ChartAuditPage.tsx": {
+    "mtime": 1791804048.555599,
+    "seen": 1791804401.8218591,
+    "ast_hash": "f91b6b539ab90b71e55b58ce6bb8c2a2",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/UccaAnalyticsPage.tsx": {
+    "mtime": 1791804261.503651,
+    "seen": 1791804401.82186,
+    "ast_hash": "39679d14a48f1bedd3f6f37d4215e871",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/UccaCyclePage.tsx": {
+    "mtime": 1791804221.461322,
+    "seen": 1791804401.821861,
+    "ast_hash": "aec2f100e2074bb2acf21d3d91c11330",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/UccaCyclesPage.tsx": {
+    "mtime": 1791803795.69653,
+    "seen": 1791804401.821861,
+    "ast_hash": "f71cce2652654fc100fe5585fb59a7c6",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/AnswerChip.tsx": {
+    "mtime": 1791804189.7356882,
+    "seen": 1791804401.821862,
+    "ast_hash": "0f7c53bdd1396991d492deed9572cff1",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/AnswerSelector.tsx": {
+    "mtime": 1791804048.5449824,
+    "seen": 1791804401.821862,
+    "ast_hash": "eaf7d4d4ba6fb16da822c028b27ed201",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/CriterionCard.tsx": {
+    "mtime": 1791804048.5470717,
+    "seen": 1791804401.821863,
+    "ast_hash": "1d6dd825a0ae67e4f743696d16afdfed",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/EvaluationRules.tsx": {
+    "mtime": 1791804048.5537255,
+    "seen": 1791804401.821863,
+    "ast_hash": "0fa34b90ed281faf86830ef21803ba59",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/FindingSection.tsx": {
+    "mtime": 1791804048.551546,
+    "seen": 1791804401.821864,
+    "ast_hash": "781d78746922c68fd7c8b47997d49ea4",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/KpiCard.tsx": {
+    "mtime": 1791803917.416441,
+    "seen": 1791804401.821864,
+    "ast_hash": "3aa0a9d11e9f45f861971716f914826b",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/OutcomeBadge.tsx": {
+    "mtime": 1791803795.6947136,
+    "seen": 1791804401.8218648,
+    "ast_hash": "4c58176524f0c9c674c9ad55371a9a07",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/RateBars.tsx": {
+    "mtime": 1791804261.5017276,
+    "seen": 1791804401.8218648,
+    "ast_hash": "f369edf02e6225cd7a0606270f6795b6",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/components/ScoreBar.tsx": {
+    "mtime": 1791804048.5488873,
+    "seen": 1791804401.821866,
+    "ast_hash": "8a22c63799b7807ad391099482cfd59d",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/scoring.ts": {
+    "mtime": 1791803795.6900206,
+    "seen": 1791804401.821867,
+    "ast_hash": "f06c6ddac7063f73d40923fe46453718",
+    "semantic_hash": ""
+  },
+  "frontend/src/modules/ucca/types.ts": {
+    "mtime": 1791803795.688048,
+    "seen": 1791804401.821867,
+    "ast_hash": "24fd628a2c4f9ea0fb23d0735ca7d9a5",
+    "semantic_hash": ""
+  },
+  "docs/AEGIS_M04_UCCA_Chart_Audit.md": {
+    "mtime": 1791804370.5319002,
+    "seen": 1791804401.821986,
+    "ast_hash": "1f0975e1baf457dd09c8ef82f6d18112",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-10-12-ucca-chart-audit.md": {
+    "mtime": 1791797869.5191207,
+    "seen": 1791804401.822016,
+    "ast_hash": "44ef7a8d963aa344f70b2bb708d8e13f",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-10-12-ucca-chart-audit-design.md": {
+    "mtime": 1791796536.595249,
+    "seen": 1791804401.822032,
+    "ast_hash": "ccbe9accc35b65cffc274f4816fec0ee",
     "semantic_hash": ""
   }
 }
