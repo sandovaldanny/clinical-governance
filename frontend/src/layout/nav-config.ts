@@ -1,4 +1,4 @@
-/** Navegación: Administración (M01/M02) primero, luego Gobierno clínico (M04/M05). Etiquetas vía i18n. */
+/** Navegación: Administración primero, luego Gobierno clínico y Dashboard. Etiquetas vía i18n. */
 
 export type NavItem = {
   labelKey: string;
@@ -30,5 +30,9 @@ export const NAV_GROUPS: NavGroup[] = [
       { labelKey: "nav.aegis", path: "/aegis" },
       { labelKey: "nav.indicators", path: "/indicators" },
     ],
+  },
+  {
+    titleKey: "nav.dashboard",
+    items: [{ labelKey: "nav.dashboardOverview", path: "/dashboard" }],
   },
 ];

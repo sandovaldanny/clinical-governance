@@ -38,7 +38,7 @@
   },
   "nav": {
     "governance": "Gobierno clínico",
-    "admin": "Administración (M01–M02)",
+    "admin": "Administración",
     "uccaCycles": "UCCA",
     "indicators": "Indicadores a evaluar",
     "users": "Usuarios",
@@ -48,7 +48,9 @@
     "criteria": "Criterios de evaluación",
     "roles": "Roles AEGIS",
     "positions": "Cargos",
-    "aegis": "AEGIS"
+    "aegis": "AEGIS",
+    "dashboard": "Dashboard",
+    "dashboardOverview": "Resumen"
   },
   "login": {
     "welcome": "Bienvenido",
@@ -254,5 +256,9 @@
   "aegis": {
     "title": "AEGIS",
     "subtitle": "Módulo en construcción. Pronto disponible."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Panel de resultados en construcción. Pronto disponible."
   }
 }

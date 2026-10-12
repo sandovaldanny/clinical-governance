@@ -38,7 +38,7 @@
   },
   "nav": {
     "governance": "Clinical governance",
-    "admin": "Administration (M01–M02)",
+    "admin": "Administration",
     "uccaCycles": "UCCA",
     "indicators": "Indicators to assess",
     "users": "Users",
@@ -48,7 +48,9 @@
     "criteria": "Evaluation criteria",
     "roles": "AEGIS roles",
     "positions": "Positions",
-    "aegis": "AEGIS"
+    "aegis": "AEGIS",
+    "dashboard": "Dashboard",
+    "dashboardOverview": "Overview"
   },
   "login": {
     "welcome": "Welcome",
@@ -254,5 +256,9 @@
   "aegis": {
     "title": "AEGIS",
     "subtitle": "Module under construction. Coming soon."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Results panel under construction. Coming soon."
   }
 }
