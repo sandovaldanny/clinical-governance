@@ -211,6 +211,16 @@
       "due": "Vence",
       "period": "Periodo",
       "noActions": "No hay acciones correctivas abiertas."
+    },
+    "rules": {
+      "title": "Reglas de evaluación",
+      "scoreLabel": "Score",
+      "score": "Score = Yes ÷ Aplicables × 100. Los N/A no cuentan en el denominador. Si no hay aplicables, no hay score ni outcome.",
+      "outcomeLabel": "Outcome según score",
+      "na": "Cada N/A exige una razón corta y trazable.",
+      "finding": "Si el outcome no es Compliant y hay al menos un No, el hallazgo principal es obligatorio; la acción correctiva (responsable y fecha límite) es recomendable.",
+      "workflow": "Flujo: Borrador → Enviado → Aprobado. Una auditoría aprobada es inmutable.",
+      "dashboard": "El dashboard solo cuenta auditorías enviadas o aprobadas; el % por criterio = Yes ÷ (Yes + No)."
     }
   },
   "indicators": {

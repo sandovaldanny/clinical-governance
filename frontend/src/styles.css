@@ -77,3 +77,12 @@ button:disabled { cursor: not-allowed; opacity: .55; }
   font-size: 12px;
   font-weight: 500;
 }
+
+/* Selector segmentado Yes / No / N/A (UCCA chart audit) */
+.segmented { display: inline-flex; border: 1px solid var(--alkalma-border, #DCE5EA); border-radius: 999px; overflow: hidden; }
+.segmented button { border: 0; background: #fff; padding: 6px 14px; font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; color: #16455C; }
+.segmented button + button { border-left: 1px solid #DCE5EA; }
+.segmented button[aria-pressed="true"][data-value="compliant"] { background: #70C8C3; color: #16455C; }
+.segmented button[aria-pressed="true"][data-value="non_compliant"] { background: #B3261E; color: #fff; }
+.segmented button[aria-pressed="true"][data-value="not_applicable"] { background: #8B9EA5; color: #fff; }
+.segmented button:disabled { cursor: default; opacity: .7; }

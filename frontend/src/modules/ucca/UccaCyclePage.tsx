@@ -63,38 +63,43 @@ export function UccaCyclePage() {
       {audits.error && <p>{audits.error}</p>}
       {!audits.loading && !audits.error && (
         <DataTable
-          rows={audits.data.map((r, i) => ({ ...r, num: i + 1 }))}
+          dense
+          rows={audits.data}
           emptyMessage={t("ucca.table.empty")}
           columns={[
-            { key: "num", header: t("ucca.table.num"), width: 36, render: (r) => <span style={muted}>{r.num}</span> },
-            { key: "cg", header: t("ucca.table.cgId"), width: 80, render: (r) => <code style={{ fontSize: 12 }}>{r.employee_number}</code> },
+            { key: "cg", header: t("ucca.table.cgId"), width: 64, render: (r) => <code style={{ fontSize: 12, whiteSpace: "nowrap" }}>{r.employee_number}</code> },
             { key: "pro", header: t("ucca.table.professional"), render: (r) => (
               <span style={{ display: "block", ...small }}>
                 <strong style={{ fontWeight: 500 }}>{r.professional_name}</strong>
                 <span style={{ display: "block", ...muted }}>{r.profession_name ?? "—"}</span>
               </span>
             ) },
-            { key: "mrn", header: t("ucca.table.mrn"), width: 110, render: (r) => (
-              <>
-                <code style={{ fontSize: 12 }}>{r.case_reference}</code>
+            { key: "mrn", header: t("ucca.table.mrn"), width: 96, render: (r) => (
+              <span style={{ display: "block" }}>
+                <Link to={`/ucca/audits/${r.id}`} title={t("ucca.table.open")}
+                      style={{ color: brandTokens.colors.link, fontWeight: 600, textDecoration: "none", fontFamily: "monospace", fontSize: 12 }}>
+                  {r.case_reference}
+                </Link>
                 {r.has_finding && (
                   <span aria-label={t("ucca.table.finding")} title={t("ucca.table.finding")}
                         style={{ display: "inline-block", width: 8, height: 8, borderRadius: "50%", background: brandTokens.colors.warning, marginLeft: 6 }} />
                 )}
-              </>
+                <span style={{ display: "block", ...muted }}>{r.audit_date}</span>
+              </span>
             ) },
-            { key: "date", header: t("ucca.table.date"), width: 96, render: (r) => <span style={small}>{r.audit_date}</span> },
             ...codes.map((code) => ({
-              key: code, header: code, width: 44,
+              key: code, header: code, width: 34,
               render: (r: ChartAuditRow) => <AnswerChip value={r.answers[code]} />,
             })),
-            { key: "app", header: t("ucca.table.applicable"), width: 52, render: (r) => <span style={small}>{r.applicable_count}</span> },
-            { key: "yes", header: t("ucca.table.yes"), width: 44, render: (r) => <span style={small}>{r.yes_count}</span> },
-            { key: "score", header: t("ucca.table.score"), width: 70, render: (r) => <strong style={{ ...small, fontWeight: 600 }}>{formatScore(r.score)}</strong> },
-            { key: "outcome", header: t("ucca.table.outcome"), width: 140, render: (r) => <OutcomeBadge outcome={r.outcome} /> },
-            { key: "status", header: t("ucca.table.status"), width: 90, render: (r) => <StatusBadge code={r.status} ns="ucca.statuses" /> },
-            { key: "open", header: "", width: 64, render: (r) => (
-              <Link to={`/ucca/audits/${r.id}`} className="btn-ghost" style={{ padding: "4px 10px", fontSize: 12, textDecoration: "none" }}>{t("ucca.table.open")}</Link>
+            { key: "yes", header: `${t("ucca.table.yes")}/${t("ucca.table.applicable")}`, width: 60, render: (r) => (
+              <span style={small}>{r.yes_count}/{r.applicable_count}</span>
+            ) },
+            { key: "score", header: t("ucca.table.score"), width: 60, render: (r) => <strong style={{ ...small, fontWeight: 600, whiteSpace: "nowrap" }}>{formatScore(r.score)}</strong> },
+            { key: "outcome", header: t("ucca.table.outcome"), width: 132, render: (r) => (
+              <span style={{ display: "grid", gap: 4, justifyItems: "start" }}>
+                <OutcomeBadge outcome={r.outcome} />
+                <StatusBadge code={r.status} ns="ucca.statuses" />
+              </span>
             ) },
           ]}
         />

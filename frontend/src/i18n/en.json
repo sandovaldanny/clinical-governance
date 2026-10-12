@@ -211,6 +211,16 @@
       "due": "Due",
       "period": "Period",
       "noActions": "No open corrective actions."
+    },
+    "rules": {
+      "title": "Evaluation rules",
+      "scoreLabel": "Score",
+      "score": "Score = Yes ÷ Applicable × 100. N/A answers are excluded from the denominator. With no applicable criteria there is no score or outcome.",
+      "outcomeLabel": "Outcome by score",
+      "na": "Every N/A requires a short, traceable reason.",
+      "finding": "If the outcome is not Compliant and there is at least one No, the key finding is mandatory; a corrective action (owner and due date) is recommended.",
+      "workflow": "Workflow: Draft → Submitted → Approved. An approved audit is immutable.",
+      "dashboard": "The dashboard only counts submitted or approved audits; % per criterion = Yes ÷ (Yes + No)."
     }
   },
   "indicators": {

@@ -16,8 +16,8 @@ export function AnswerChip({ value }: { value: AnswerValue | undefined }) {
   const s = STYLE[value];
   return (
     <span title={t(`ucca.answers.${value}`)} aria-label={t(`ucca.answers.${value}`)}
-          style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 28, height: 22, padding: "0 6px",
-                   borderRadius: 999, fontSize: 12, fontWeight: 700, background: s.bg, color: s.fg }}>
+          style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", minWidth: 26, height: 22, padding: "0 4px",
+                   borderRadius: 999, fontSize: 11, fontWeight: 700, background: s.bg, color: s.fg }}>
       {s.glyph}
     </span>
   );

@@ -14,9 +14,12 @@ type DataTableProps<T> = {
   columns: Column<T>[];
   rows: T[];
   emptyMessage: string;
+  /** Celdas compactas (menos padding, texto 13px) para tablas con muchas columnas, sin scroll horizontal. */
+  dense?: boolean;
 };
 
-export function DataTable<T extends { id?: string }>({ columns, rows, emptyMessage }: DataTableProps<T>) {
+export function DataTable<T extends { id?: string }>({ columns, rows, emptyMessage, dense = false }: DataTableProps<T>) {
+  const cellPadding = dense ? "10px 8px" : "14px 16px";
   if (rows.length === 0) {
     return (
       <p
@@ -52,8 +55,8 @@ export function DataTable<T extends { id?: string }>({ columns, rows, emptyMessa
                 key={col.key}
                 style={{
                   width: col.width,
-                  padding: "14px 16px",
-                  fontSize: 12,
+                  padding: cellPadding,
+                  fontSize: dense ? 11 : 12,
                   fontWeight: 700,
                   letterSpacing: "0.04em",
                   textTransform: "uppercase",
@@ -69,7 +72,7 @@ export function DataTable<T extends { id?: string }>({ columns, rows, emptyMessa
           {rows.map((row, idx) => (
             <tr key={row.id ?? idx} style={{ borderTop: `1px solid ${brandTokens.colors.border}` }}>
               {columns.map((col) => (
-                <td key={col.key} style={{ padding: "14px 16px", fontSize: 14, verticalAlign: "top" }}>
+                <td key={col.key} style={{ padding: cellPadding, fontSize: dense ? 13 : 14, verticalAlign: "top" }}>
                   {col.render(row)}
                 </td>
               ))}
