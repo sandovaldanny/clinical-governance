@@ -37,6 +37,15 @@ input, select, textarea {
   background: #fff;
   transition: border-color .15s, box-shadow .15s;
 }
+/* Casillas y radios: tamaño natural, sin heredar el ancho/padding de los campos de texto. */
+input[type="checkbox"], input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin: 0;
+  flex: 0 0 auto;
+  accent-color: var(--alkalma-turquoise);
+}
 input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--alkalma-turquoise);
