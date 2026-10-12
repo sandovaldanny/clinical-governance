@@ -95,7 +95,8 @@ docker compose config --quiet                    # valida el compose
 
 `seed_demo_data` es idempotente. Carga centros (Al Bateen, Al Falah), profesiones, especialidades,
 cargos, 9 roles con su matriz de permisos, catálogos JAWDA/OMH001 (10 investigaciones, clases de
-medicación), 7 usuarios demo, 3 profesionales, la plantilla UCCA v1 con 21 criterios y un ciclo Q3-2026.
+medicación), 7 usuarios demo, 3 profesionales, la plantilla UCCA v1 con los 7 criterios de evaluación
+(CCA, CRS, CTP, COM, CDC, CEP, CMC) y un ciclo Q3-2026.
 
 | Usuario | Rol | Alcance |
 |---|---|---|
@@ -132,6 +133,7 @@ registrar, editar y activar/inactivar, siempre auditado en `audit_events`:
 | Centros | `GET/POST /identity/facilities`, `PATCH …/{id}` | País/ciudad desde catálogos, director clínico (lookup de usuarios), estado `active / closed`. |
 | Profesiones | `GET/POST /identity/professions`, `PATCH …/{id}` | — |
 | Especialidades | `GET/POST /identity/catalogs`, `PATCH …/{id}` | Catálogo genérico (`catalog_type=specialty`). |
+| Criterios de evaluación | `GET/POST /ucca/criteria`, `PATCH …/{id}` | Código · Dominio · Pregunta universal · Interpretación por profesión · Ejemplos/Evidencia. Se ligan a la versión de plantilla UCCA vigente; `?only_active=true` alimenta Evaluar e Indicadores. Inactivar no borra el histórico. |
 | Roles | `GET /identity/permissions`, `GET/POST /identity/roles`, `PATCH …/{id}` | Matriz rol→permiso editable por módulo; System Administrator conserva todos los permisos. Los permisos viajan en el JWT y aplican en el siguiente inicio de sesión. |
 
 Permisos que gobiernan la escritura: `users.manage`, `catalogs.manage`, `facilities.manage`, `roles.manage`.

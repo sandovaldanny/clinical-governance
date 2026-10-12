@@ -288,7 +288,7 @@ export function MasterDataPage<T extends { id: string }>(props: MasterDataPagePr
                 <input value={values[f.key] ?? ""} onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))} required={f.required} />
               )}
               {f.type === "textarea" && (
-                <textarea rows={3} value={values[f.key] ?? ""} onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))} />
+                <textarea rows={3} value={values[f.key] ?? ""} onChange={(e) => setValues((v) => ({ ...v, [f.key]: e.target.value }))} required={f.required} />
               )}
               {f.type === "select" && f.optionsFrom && (
                 <DynamicOptions spec={f}>

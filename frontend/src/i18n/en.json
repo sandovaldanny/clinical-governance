@@ -45,6 +45,7 @@
     "facilities": "Facilities",
     "professions": "Professions",
     "specialties": "Specialties",
+    "criteria": "Evaluation criteria",
     "roles": "AEGIS roles",
     "positions": "Positions"
   },
@@ -81,6 +82,9 @@
     "back": "Back to cycles",
     "formTitle": "Record assessment",
     "criterion": "Criterion / indicator",
+    "criterionQuestion": "Universal question",
+    "criterionInterpretation": "Profession-specific interpretation",
+    "criterionEvidence": "Examples / evidence",
     "professional": "Professional (physicians at the facility)",
     "noPhysicians": "No physicians at this facility",
     "outcome": "Outcome",
@@ -114,24 +118,19 @@
   },
   "indicators": {
     "title": "Indicators to assess",
-    "subtitle": "M04 UCCA + M05 JAWDA/OMH001 — versioned criteria of the current template and regulatory catalogs",
-    "uccaTitle": "UCCA — Audit criteria (current template)",
+    "subtitle": "M04 UCCA + M05 JAWDA/OMH001 — current evaluation criteria and regulatory catalogs",
+    "uccaTitle": "UCCA — Evaluation criteria (current template)",
     "uccaLoading": "Loading UCCA criteria…",
     "uccaEmpty": "No UCCA criteria configured.",
     "code": "Code",
-    "criterion": "Indicator / criterion",
-    "severity": "Severity",
+    "domain": "Domain",
+    "criterion": "Universal question",
     "omhTitle": "OMH001 — Required investigations (antipsychotics)",
     "omhEmpty": "No OMH001 investigations configured.",
     "investigation": "Investigation",
     "medTitle": "Psychotropic medication classification (M05)",
     "medEmpty": "No medication classes configured.",
-    "medClass": "Class / pathway",
-    "severities": {
-      "critical": "Critical",
-      "major": "Major",
-      "standard": "Standard"
-    }
+    "medClass": "Class / pathway"
   },
   "admin": {
     "users": {
@@ -205,6 +204,22 @@
       "new": "New specialty",
       "edit": "Edit specialty",
       "codeHint": "Stable lowercase identifier without spaces (e.g. clinical_psychology). Cannot be changed later."
+    },
+    "criteria": {
+      "title": "Evaluation criteria",
+      "subtitle": "M04 — Current UCCA template: clinical domain, universal question, profession-specific interpretation and expected evidence",
+      "empty": "No evaluation criteria recorded.",
+      "new": "New criterion",
+      "edit": "Edit criterion",
+      "code": "Code",
+      "codeHint": "Short uppercase identifier (e.g. CCA, CRS). Cannot be changed later.",
+      "domain": "Domain",
+      "universalQuestion": "Universal question",
+      "universalQuestionHint": "What is assessed across all professions.",
+      "professionInterpretation": "Profession-specific interpretation",
+      "professionInterpretationHint": "How the question reads within the professional's scope of practice.",
+      "examplesEvidence": "Examples / evidence",
+      "examplesEvidenceHint": "What the auditor should find in the record to mark compliance."
     },
     "roles": {
       "title": "AEGIS roles",

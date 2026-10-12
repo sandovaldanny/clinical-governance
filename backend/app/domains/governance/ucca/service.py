@@ -13,6 +13,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.audit import record_event
+from app.core.master_data import create_audited, get_or_404, update_audited
 from app.domains.governance.ucca.models import (
     AuditCriterion,
     AuditCycle,
@@ -154,7 +155,7 @@ def list_results(db: Session, *, cycle_id: uuid.UUID) -> list[dict]:
         select(
             AuditResult,
             AuditCriterion.code,
-            AuditCriterion.description,
+            AuditCriterion.domain,
         )
         .join(AuditCriterion, AuditResult.criterion_id == AuditCriterion.id)
         .where(AuditResult.cycle_id == cycle_id)
@@ -163,13 +164,13 @@ def list_results(db: Session, *, cycle_id: uuid.UUID) -> list[dict]:
     from app.domains.identity.models import Professional
 
     results: list[dict] = []
-    for result, criterion_code, criterion_description in rows:
+    for result, criterion_code, criterion_domain in rows:
         professional = db.scalar(select(Professional).where(Professional.id == result.professional_id))
         results.append(
             {
                 "id": result.id,
                 "criterion_code": criterion_code,
-                "criterion_description": criterion_description,
+                "criterion_domain": criterion_domain,
                 "professional_name": professional.full_name if professional else "—",
                 "outcome": result.outcome,
                 "status": result.status,
@@ -180,17 +181,65 @@ def list_results(db: Session, *, cycle_id: uuid.UUID) -> list[dict]:
     return results
 
 
-def list_criteria(db: Session) -> list[AuditCriterion]:
-    """Indicadores/criterios de la plantilla UCCA vigente (M04 + JAWDA/OMH001)."""
-    current_version = db.scalar(
-        select(AuditTemplateVersion).where(AuditTemplateVersion.is_current.is_(True))
-    )
+def _current_template_version(db: Session) -> AuditTemplateVersion | None:
+    return db.scalar(select(AuditTemplateVersion).where(AuditTemplateVersion.is_current.is_(True)))
+
+
+def list_criteria(db: Session, *, only_active: bool = False) -> list[AuditCriterion]:
+    """Criterios de evaluación de la plantilla UCCA vigente. `only_active` para formularios de
+    evaluación; Administración lista todos para poder reactivarlos."""
+    current_version = _current_template_version(db)
     if not current_version:
         return []
-    return list(
-        db.scalars(
-            select(AuditCriterion)
-            .where(AuditCriterion.template_version_id == current_version.id)
-            .order_by(AuditCriterion.code)
-        ).all()
+    stmt = select(AuditCriterion).where(AuditCriterion.template_version_id == current_version.id)
+    if only_active:
+        stmt = stmt.where(AuditCriterion.is_active.is_(True))
+    return list(db.scalars(stmt.order_by(AuditCriterion.code)).all())
+
+
+def create_criterion(
+    db: Session,
+    *,
+    actor_user_id: uuid.UUID,
+    code: str,
+    domain: str,
+    universal_question: str,
+    profession_interpretation: str,
+    examples_evidence: str,
+) -> AuditCriterion:
+    """Crea un criterio en la versión de plantilla vigente. Código único por versión."""
+    current_version = _current_template_version(db)
+    if not current_version:
+        raise ValueError("No hay una versión de plantilla UCCA vigente; ejecute el seed primero.")
+    code = code.strip().upper()
+    duplicate = db.scalar(
+        select(AuditCriterion).where(
+            AuditCriterion.template_version_id == current_version.id,
+            AuditCriterion.code == code,
+        )
     )
+    if duplicate:
+        raise PermissionError("Ya existe un criterio con ese código en la plantilla vigente.")
+    obj = AuditCriterion(
+        template_version_id=current_version.id,
+        code=code,
+        domain=domain.strip(),
+        universal_question=universal_question.strip(),
+        profession_interpretation=profession_interpretation.strip(),
+        examples_evidence=examples_evidence.strip(),
+        is_active=True,
+    )
+    return create_audited(
+        db, obj, actor_user_id=actor_user_id, module="ucca", entity_type="AuditCriterion",
+        new_values={
+            "template_version_id": str(current_version.id),
+            "code": code,
+            "domain": obj.domain,
+            "universal_question": obj.universal_question,
+        },
+    )
+
+
+def update_criterion(db: Session, *, actor_user_id: uuid.UUID, criterion_id: uuid.UUID, data: dict) -> AuditCriterion:
+    obj = get_or_404(db, AuditCriterion, criterion_id, "Criterio")
+    return update_audited(db, obj, actor_user_id=actor_user_id, module="ucca", entity_type="AuditCriterion", data=data)

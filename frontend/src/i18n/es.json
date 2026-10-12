@@ -45,6 +45,7 @@
     "facilities": "Centros médicos",
     "professions": "Profesiones",
     "specialties": "Especialidades",
+    "criteria": "Criterios de evaluación",
     "roles": "Roles AEGIS",
     "positions": "Cargos"
   },
@@ -81,6 +82,9 @@
     "back": "Volver a ciclos",
     "formTitle": "Registrar evaluación",
     "criterion": "Criterio / indicador",
+    "criterionQuestion": "Pregunta universal",
+    "criterionInterpretation": "Interpretación por profesión",
+    "criterionEvidence": "Ejemplos / evidencia",
     "professional": "Profesional (médicos del centro)",
     "noPhysicians": "No hay médicos en este centro",
     "outcome": "Resultado",
@@ -114,24 +118,19 @@
   },
   "indicators": {
     "title": "Indicadores a evaluar",
-    "subtitle": "M04 UCCA + M05 JAWDA/OMH001 — criterios versionados de la plantilla vigente y catálogos regulatorios",
-    "uccaTitle": "UCCA — Criterios de auditoría (plantilla vigente)",
+    "subtitle": "M04 UCCA + M05 JAWDA/OMH001 — criterios de evaluación vigentes y catálogos regulatorios",
+    "uccaTitle": "UCCA — Criterios de evaluación (plantilla vigente)",
     "uccaLoading": "Cargando criterios UCCA…",
     "uccaEmpty": "No hay criterios UCCA configurados.",
     "code": "Código",
-    "criterion": "Indicador / criterio",
-    "severity": "Severidad",
+    "domain": "Dominio",
+    "criterion": "Pregunta universal",
     "omhTitle": "OMH001 — Investigaciones requeridas (antipsicóticos)",
     "omhEmpty": "No hay investigaciones OMH001 configuradas.",
     "investigation": "Investigación",
     "medTitle": "Clasificación de medicación psicotrópica (M05)",
     "medEmpty": "No hay clases de medicación configuradas.",
-    "medClass": "Clase / ruta",
-    "severities": {
-      "critical": "Crítica",
-      "major": "Mayor",
-      "standard": "Estándar"
-    }
+    "medClass": "Clase / ruta"
   },
   "admin": {
     "users": {
@@ -205,6 +204,22 @@
       "new": "Nueva especialidad",
       "edit": "Editar especialidad",
       "codeHint": "Identificador estable en minúsculas, sin espacios (ej. clinical_psychology). No se puede cambiar después."
+    },
+    "criteria": {
+      "title": "Criterios de evaluación",
+      "subtitle": "M04 — Plantilla UCCA vigente: dominio clínico, pregunta universal, interpretación por profesión y evidencia esperada",
+      "empty": "No hay criterios de evaluación registrados.",
+      "new": "Nuevo criterio",
+      "edit": "Editar criterio",
+      "code": "Código",
+      "codeHint": "Identificador corto en mayúsculas (ej. CCA, CRS). No se puede cambiar después.",
+      "domain": "Dominio",
+      "universalQuestion": "Pregunta universal",
+      "universalQuestionHint": "Qué se evalúa en todas las profesiones.",
+      "professionInterpretation": "Interpretación por profesión",
+      "professionInterpretationHint": "Cómo se lee la pregunta en el alcance de práctica del profesional.",
+      "examplesEvidence": "Ejemplos / evidencia",
+      "examplesEvidenceHint": "Qué debe encontrar el auditor en el expediente para marcar cumplimiento."
     },
     "roles": {
       "title": "Roles AEGIS",

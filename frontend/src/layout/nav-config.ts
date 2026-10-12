@@ -19,6 +19,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { labelKey: "nav.facilities", path: "/admin/facilities" },
       { labelKey: "nav.professions", path: "/admin/professions" },
       { labelKey: "nav.specialties", path: "/admin/specialties" },
+      { labelKey: "nav.criteria", path: "/admin/criteria" },
       { labelKey: "nav.roles", path: "/admin/roles" },
     ],
   },

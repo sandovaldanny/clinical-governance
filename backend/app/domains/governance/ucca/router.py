@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import uuid
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import CurrentUser
+from app.core.master_data import domain_errors
 from app.core.rbac import require_facility_access, require_permission
 from app.domains.governance.ucca import schemas, service
 
@@ -23,10 +24,37 @@ def list_cycles(
 
 @router.get("/criteria", response_model=list[schemas.AuditCriterionOut])
 def list_criteria(
+    only_active: bool = Query(default=False),
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(require_permission("ucca.view")),
 ) -> list[schemas.AuditCriterionOut]:
-    return service.list_criteria(db)
+    return service.list_criteria(db, only_active=only_active)
+
+
+@router.post("/criteria", response_model=schemas.AuditCriterionOut, status_code=status.HTTP_201_CREATED)
+def create_criterion(
+    payload: schemas.AuditCriterionCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("catalogs.manage")),
+) -> schemas.AuditCriterionOut:
+    return domain_errors(
+        lambda: service.create_criterion(db, actor_user_id=uuid.UUID(current_user.id), **payload.model_dump())
+    )
+
+
+@router.patch("/criteria/{criterion_id}", response_model=schemas.AuditCriterionOut)
+def update_criterion(
+    criterion_id: uuid.UUID,
+    payload: schemas.AuditCriterionUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("catalogs.manage")),
+) -> schemas.AuditCriterionOut:
+    return domain_errors(
+        lambda: service.update_criterion(
+            db, actor_user_id=uuid.UUID(current_user.id), criterion_id=criterion_id,
+            data=payload.model_dump(exclude_unset=True),
+        )
+    )
 
 
 @router.get("/results", response_model=list[schemas.AuditResultDetailOut])

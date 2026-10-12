@@ -205,28 +205,58 @@ CATALOG_ENTRIES: list[tuple[str, str, str]] = [
     ("finding_status", "closed", "Cerrado"),
 ]
 
+# Criterios de evaluación (Código, Dominio, Pregunta universal, Interpretación por profesión,
+# Ejemplos/Evidencia). Texto fuente en inglés tal como lo define el equipo clínico de Alkalma.
 UCCA_CRITERIA = [
-    ("DOC-001", "Documentación clínica completa, legible y fechada", "standard"),
-    ("DOC-002", "Consentimiento informado documentado cuando aplica", "standard"),
-    ("SAF-001", "Verificación de identidad del paciente registrada", "major"),
-    ("SAF-002", "Plan de seguridad del paciente documentado", "major"),
-    ("GOV-001", "Cumplimiento de políticas de gobierno clínico del centro", "standard"),
-    ("REG-001", "Evidencia de cumplimiento regulatorio DOH disponible", "major"),
-    ("JAWDA-001", "Indicador JAWDA aplicable registrado con fuente y versión", "major"),
-    ("PROF-001", "Autoría del profesional tratante en notas clínicas", "standard"),
-    ("MED-001", "Reconciliación medicamentosa documentada", "major"),
-    ("PSY-001", "PHQ-9 registrado cuando corresponde (monitoreo psicotrópico)", "standard"),
-    ("PSY-002", "GAD-7 registrado cuando corresponde (monitoreo psicotrópico)", "standard"),
-    ("OMH-001", "ECG dentro de ventana OMH001 (12 meses)", "critical"),
-    ("OMH-002", "Full Blood Count dentro de ventana OMH001", "critical"),
-    ("OMH-003", "HbA1c dentro de ventana OMH001", "critical"),
-    ("OMH-004", "Lipid Profile dentro de ventana OMH001", "critical"),
-    ("OMH-005", "ALT dentro de ventana OMH001", "critical"),
-    ("OMH-006", "AST dentro de ventana OMH001", "critical"),
-    ("OMH-007", "Urea dentro de ventana OMH001", "critical"),
-    ("OMH-008", "Sodium dentro de ventana OMH001", "critical"),
-    ("OMH-009", "Potassium dentro de ventana OMH001", "critical"),
-    ("OMH-010", "Creatinine dentro de ventana OMH001", "critical"),
+    (
+        "CCA",
+        "Clinical Assessment",
+        "Was an appropriate assessment completed and documented according to scope?",
+        "Psychiatric history, MSE, diagnosis/formulation and differential where relevant.",
+        "Psychiatric history, MSE, diagnosis/formulation and differential where relevant.",
+    ),
+    (
+        "CRS",
+        "Clinical Risk & Safety",
+        "Were relevant clinical, safeguarding and treatment risks identified and documented?",
+        "Suicide, violence, safeguarding, capacity and medication risks; safety plan/escalation when indicated.",
+        "Suicide, violence, safeguarding, capacity and medication risks; safety plan/escalation when indicated.",
+    ),
+    (
+        "CTP",
+        "Clinical Treatment Planning",
+        "Was an evidence-based intervention or management plan selected and documented?",
+        "Medication rationale, psychoeducation, psychotherapy/referral, investigations and follow-up aligned with diagnosis.",
+        "Medication rationale, psychoeducation, psychotherapy/referral, investigations and follow-up aligned with diagnosis.",
+    ),
+    (
+        "COM",
+        "Clinical Outcome Monitoring",
+        "Was response and safety monitoring completed and the plan adjusted when indicated?",
+        "Response, adherence, side effects, physical monitoring and relevant outcome measures reviewed.",
+        "Response, adherence, side effects, physical monitoring and relevant outcome measures reviewed.",
+    ),
+    (
+        "CDC",
+        "Clinical Documentation & Compliance",
+        "Was the record complete, accurate, timely and compliant?",
+        "History, MSE, risk, diagnosis code, medication dose, consent and follow-up plan complete and timely.",
+        "History, MSE, risk, diagnosis code, medication dose, consent and follow-up plan complete and timely.",
+    ),
+    (
+        "CEP",
+        "Clinical Ethics & Professionalism",
+        "Were consent, confidentiality, boundaries and professional standards maintained?",
+        "Shared decision-making, confidentiality, capacity, boundaries and ethical prescribing maintained.",
+        "Shared decision-making, confidentiality, capacity, boundaries and ethical prescribing maintained.",
+    ),
+    (
+        "CMC",
+        "Clinical Communication & MDT",
+        "Was communication with patient, family and MDT appropriate and documented?",
+        "Patient/family education, consented involvement, referrals, handover and MDT communication documented.",
+        "Patient/family education, consented involvement, referrals, handover and MDT communication documented.",
+    ),
 ]
 
 DEMO_USERS = [
@@ -597,7 +627,7 @@ def _seed_ucca_template(db: Session) -> AuditTemplateVersion:
         db.add(version)
         db.flush()
 
-    for code, description, severity in UCCA_CRITERIA:
+    for code, domain, question, interpretation, evidence in UCCA_CRITERIA:
         exists = db.scalar(
             select(AuditCriterion).where(
                 AuditCriterion.template_version_id == version.id,
@@ -609,8 +639,11 @@ def _seed_ucca_template(db: Session) -> AuditTemplateVersion:
                 AuditCriterion(
                     template_version_id=version.id,
                     code=code,
-                    description=description,
-                    severity=severity,
+                    domain=domain,
+                    universal_question=question,
+                    profession_interpretation=interpretation,
+                    examples_evidence=evidence,
+                    is_active=True,
                 )
             )
 
@@ -678,7 +711,7 @@ def run() -> None:
         print(f"  Centros: {len(facilities)}")
         print(f"  Usuarios demo: {len(DEMO_USERS)}")
         print(f"  Profesionales: {len(DEMO_PROFESSIONALS)}")
-        print(f"  Criterios UCCA/OMH001: {criteria_count}")
+        print(f"  Criterios de evaluación: {criteria_count}")
         print(f"  Valores de catálogo: {catalog_count}")
         print("\nCredenciales demo (excepto admin):")
         print(f"  Contraseña: {DEMO_PASSWORD}")

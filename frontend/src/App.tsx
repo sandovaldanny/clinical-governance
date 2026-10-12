@@ -4,6 +4,7 @@ import { AppShell } from "./layout/AppShell";
 import { LoginPage } from "./auth/LoginPage";
 import { useAuth } from "./auth/AuthContext";
 import { AUTH_DISABLED } from "./api/client";
+import { CriteriaPage } from "./modules/admin/CriteriaPage";
 import { FacilitiesPage } from "./modules/admin/FacilitiesPage";
 import { PositionsPage } from "./modules/admin/PositionsPage";
 import { ProfessionsPage } from "./modules/admin/ProfessionsPage";
@@ -31,6 +32,7 @@ export function App() {
         <Route path="/admin/facilities" element={<FacilitiesPage />} />
         <Route path="/admin/professions" element={<ProfessionsPage />} />
         <Route path="/admin/specialties" element={<SpecialtiesPage />} />
+        <Route path="/admin/criteria" element={<CriteriaPage />} />
         <Route path="/admin/roles" element={<RolesPage />} />
       </Route>
     </Routes>

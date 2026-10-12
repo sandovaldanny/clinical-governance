@@ -40,9 +40,12 @@ class AuditTemplateVersion(Base):
 
 
 class AuditCriterion(Base):
-    """Criterio evaluable dentro de una versión de plantilla. Puede aplicar solo a ciertas
-    profesiones (regla crítica del funcional, sección M02): la aplicabilidad la resuelve el
-    motor de reglas, no una columna booleana embebida aquí."""
+    """Criterio de evaluación dentro de una versión de plantilla (dominio clínico + pregunta
+    universal + interpretación por profesión + evidencia esperada). Administrable desde
+    Administración → Criterios. Puede aplicar solo a ciertas profesiones (regla crítica del
+    funcional, sección M02): la aplicabilidad la resuelve el motor de reglas, no una columna
+    booleana embebida aquí. `is_active=False` lo oculta de nuevas evaluaciones sin borrar
+    el histórico que lo referencia."""
 
     __tablename__ = "ucca_audit_criteria"
 
@@ -51,8 +54,11 @@ class AuditCriterion(Base):
         ForeignKey("ucca_audit_template_versions.id"), nullable=False
     )
     code: Mapped[str] = mapped_column(String(80), nullable=False)
-    description: Mapped[str] = mapped_column(String(500), nullable=False)
-    severity: Mapped[str] = mapped_column(String(30), default="standard")
+    domain: Mapped[str] = mapped_column(String(120), nullable=False)
+    universal_question: Mapped[str] = mapped_column(String(500), nullable=False)
+    profession_interpretation: Mapped[str] = mapped_column(String(1000), nullable=False, default="")
+    examples_evidence: Mapped[str] = mapped_column(String(1000), nullable=False, default="")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
 class AuditCycle(Base):

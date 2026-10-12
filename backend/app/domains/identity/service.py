@@ -12,6 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.audit import record_event
+from app.core.master_data import apply_changes, create_audited, get_or_404, update_audited
 from app.core.security import hash_password, verify_password
 from app.domains.identity.models import (
     FACILITY_STATUSES,
@@ -30,19 +31,7 @@ from app.domains.identity.models import (
 )
 
 
-def _apply_changes(obj, data: dict) -> tuple[dict, dict]:
-    """Asigna solo los campos presentes en `data` y devuelve (previos, nuevos) de los que cambiaron,
-    listos para record_event. Los valores se normalizan a str para el JSON del audit ledger."""
-    previous: dict = {}
-    new: dict = {}
-    for field, value in data.items():
-        current = getattr(obj, field)
-        if current == value:
-            continue
-        previous[field] = str(current) if current is not None else None
-        new[field] = str(value) if value is not None else None
-        setattr(obj, field, value)
-    return previous, new
+_apply_changes = apply_changes
 
 
 def authenticate(db: Session, *, email: str, password: str) -> User | None:
@@ -311,34 +300,14 @@ def set_initial_password(db: Session, user: User, raw_password: str) -> None:
 
 
 def _create_audited(db: Session, obj, *, actor_user_id: uuid.UUID, entity_type: str, new_values: dict):
-    db.add(obj)
-    db.flush()
-    record_event(
-        db, actor_user_id=str(actor_user_id), module="identity", entity_type=entity_type,
-        entity_id=str(obj.id), action="create", new_values=new_values,
-    )
-    db.commit()
-    db.refresh(obj)
-    return obj
+    return create_audited(db, obj, actor_user_id=actor_user_id, module="identity", entity_type=entity_type, new_values=new_values)
 
 
 def _update_audited(db: Session, obj, *, actor_user_id: uuid.UUID, entity_type: str, data: dict):
-    previous, new = _apply_changes(obj, data)
-    if new:
-        record_event(
-            db, actor_user_id=str(actor_user_id), module="identity", entity_type=entity_type,
-            entity_id=str(obj.id), action="update", previous_values=previous, new_values=new,
-        )
-    db.commit()
-    db.refresh(obj)
-    return obj
+    return update_audited(db, obj, actor_user_id=actor_user_id, module="identity", entity_type=entity_type, data=data)
 
 
-def _get_or_404(db: Session, model, row_id: uuid.UUID, label: str):
-    row = db.scalar(select(model).where(model.id == row_id))
-    if not row:
-        raise LookupError(f"{label} no encontrado")
-    return row
+_get_or_404 = get_or_404
 
 
 # ----- positions -----

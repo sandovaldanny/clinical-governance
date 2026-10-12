@@ -1,37 +1,37 @@
-# Graph Report - clinical-governance  (2026-09-24)
+# Graph Report - clinical-governance  (2026-10-12)
 
 ## Corpus Check
-- 103 files · ~40,353 words
+- 107 files · ~42,049 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 9 file(s) not represented in the graph (top: .example 3, (none) 3, .ini 1)
 
 ## Summary
-- 814 nodes · 1855 edges · 56 communities (42 shown, 14 thin omitted)
-- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 131 edges (avg confidence: 0.94)
+- 849 nodes · 1955 edges · 51 communities (39 shown, 12 thin omitted)
+- Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 138 edges (avg confidence: 0.94)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7b28c142`
+- Built from commit: `20c52eec`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - identity/service.py
 - AEGIS — Requerimiento funcional de la Plataforma de Gobierno Clínico
-- CurrentUser
-- UccaEvaluatePage.tsx
-- Base
+- deps.py
+- useApiList
+- ucca/service.py
 - AEGIS — Arquitectura Técnica de la Plataforma de Gobierno Clínico
 - package.json
 - compilerOptions
 - engine.py
 - 7. Módulos funcionales
-- identity/schemas.py
+- identity/router.py
 - Global Constraints
 - scheduler.py
 - AEGIS — Clinical Governance Platform by Alkalma Health
 - Reorganización de repo — AEGIS / clinical-governance
-- test_ucca_cycles.py
+- test_identity_me.py
 - 0003_rls_policies.py
 - 9. Capacidades transversales
 - branding — identidad Alkalma Health
@@ -44,36 +44,31 @@
 - UsersPage.tsx
 - MasterDataPage
 - brand-tokens.ts
-- _domain_errors
-- identity/router.py
+- ucca/router.py
+- test_criteria.py
 - make_client
 - App.tsx
 - FakeSession
 - useAuth
 - AEGIS Phase 1 — Module 1: User, Organization & Access Management
 - cleanup
-- client.ts
-- audit.py
+- UccaEvaluatePage.tsx
+- test_roles.py
 - test_users_create.py
-- _FakeSession
 - test_users_status.py
-- test_users_update.py
-- Scalars
-- create_role
-- Rows
-- test_identity_me.py
+- _fakes.py
 
 ## God Nodes (most connected - your core abstractions)
-1. `FakeSession` - 44 edges
-2. `CurrentUser` - 39 edges
-3. `make_client()` - 36 edges
+1. `FakeSession` - 52 edges
+2. `make_client()` - 44 edges
+3. `CurrentUser` - 41 edges
 4. `User` - 33 edges
 5. `Base` - 31 edges
-6. `brandTokens` - 20 edges
-7. `7. Módulos funcionales` - 20 edges
-8. `get_settings()` - 19 edges
-9. `AegisRole` - 19 edges
-10. `UserRoleAssignment` - 19 edges
+6. `brandTokens` - 21 edges
+7. `MasterDataPage()` - 20 edges
+8. `7. Módulos funcionales` - 20 edges
+9. `get_settings()` - 19 edges
+10. `AegisRole` - 19 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `Estado de implementación en el arquetipo (2026-09-24)` --references--> `MasterDataPage()`  [INFERRED]
@@ -90,27 +85,27 @@
 ## Import Cycles
 - None detected.
 
-## Communities (56 total, 14 thin omitted)
+## Communities (51 total, 12 thin omitted)
 
 ### Community 0 - "identity/service.py"
 Cohesion: 0.07
-Nodes (90): record_event(), hash_password(), AegisRole, Facility, OrganizationalPosition, Permission, Profession, Professional (+82 more)
+Nodes (89): hash_password(), AegisRole, CatalogValue, Facility, OrganizationalPosition, Permission, Profession, Professional (+81 more)
 
 ### Community 1 - "AEGIS — Requerimiento funcional de la Plataforma de Gobierno Clínico"
 Cohesion: 0.17
 Nodes (11): 10. Requerimientos no funcionales mínimos, 11. Reglas globales de negocio, 12. Criterios de aceptación de la primera entrega, 14. Decisiones pendientes para diseño detallado, 15. Trazabilidad con las fuentes revisadas, 16. Resultado esperado, 1. Propósito del documento, 2. Visión funcional (+3 more)
 
-### Community 2 - "CurrentUser"
-Cohesion: 0.10
-Nodes (30): get_settings(), Configuración centralizada. Todo valor de entorno se lee UNA vez aquí, nunca…, Settings, get_db(), Fija el contexto que consumen las políticas RLS definidas en las migraciones., set_tenant_context(), CurrentUser, _dev_bypass_user() (+22 more)
+### Community 2 - "deps.py"
+Cohesion: 0.09
+Nodes (31): Punto único de registro de routers. Al agregar un módulo nuevo, se agrega su…, get_settings(), Configuración centralizada. Todo valor de entorno se lee UNA vez aquí, nunca…, Settings, Fija el contexto que consumen las políticas RLS definidas en las migraciones., set_tenant_context(), _dev_bypass_user(), get_current_user() (+23 more)
 
-### Community 3 - "UccaEvaluatePage.tsx"
-Cohesion: 0.10
-Nodes (23): Column, DataTable(), DataTableProps, DynamicOptions(), PageHeader(), PageHeaderProps, StatusBadge(), toneFor() (+15 more)
+### Community 3 - "useApiList"
+Cohesion: 0.16
+Nodes (13): Column, DataTable(), DataTableProps, DynamicOptions(), PageHeader(), PageHeaderProps, useApiList(), Catalog (+5 more)
 
-### Community 4 - "Base"
+### Community 4 - "ucca/service.py"
 Cohesion: 0.05
-Nodes (64): alembic, downgrade(), upgrade(), downgrade(), upgrade(), Base, Sesión de base de datos + soporte de Row-Level Security multi-centro. Decisión…, Chequeo defensivo a nivel de aplicación; la RLS de base de datos es la barrera… (+56 more)
+Nodes (57): alembic, downgrade(), upgrade(), downgrade(), upgrade(), Audit ledger inmutable (M10 — sección 7 de la arquitectura técnica).…, record_event(), Base (+49 more)
 
 ### Community 5 - "AEGIS — Arquitectura Técnica de la Plataforma de Gobierno Clínico"
 Cohesion: 0.07
@@ -132,9 +127,9 @@ Nodes (18): evaluate(), Motor de reglas desacoplado (sección 8 de la arquitectu
 Cohesion: 0.10
 Nodes (20): 7. Módulos funcionales, M01. Gestión de Usuarios, Organización y Accesos, M02. Registro de Profesionales y Datos Maestros, M03. Registro de Gobierno Clínico, M04. Universal Clinical Competency Audit (UCCA), M05. Monitoreo de Medicación Psicotrópica y JAWDA, M06. Gestión de Acciones Correctivas, M07. Auditoría de Cumplimiento de Guías de Práctica Clínica (CPG) (+12 more)
 
-### Community 10 - "identity/schemas.py"
-Cohesion: 0.13
-Nodes (27): create_catalog_value(), create_facility(), create_position(), create_profession(), create_user(), list_catalogs(), list_facilities(), list_professions() (+19 more)
+### Community 10 - "identity/router.py"
+Cohesion: 0.09
+Nodes (62): CurrentUser, create_access_token(), create_catalog_value(), create_facility(), create_position(), create_profession(), create_role(), create_user() (+54 more)
 
 ### Community 11 - "Global Constraints"
 Cohesion: 0.22
@@ -152,9 +147,9 @@ Nodes (11): AEGIS — Clinical Governance Platform by Alkalma Health, Con Docker
 Cohesion: 0.20
 Nodes (8): Cambios de contenido requeridos, Contexto, Estructura final, Flujo de ejecución (alto nivel), Fuera de alcance, Objetivo, Reorganización de repo — AEGIS / clinical-governance, Riesgos / rollback
 
-### Community 15 - "test_ucca_cycles.py"
-Cohesion: 0.17
-Nodes (9): client(), _fake_db(), _FakeSession, fixture, TestClient, Prueba de regresión: GET /ucca/cycles debe existir y responder 200 con auth…, Sesión mínima: el bypass de desarrollo consulta el admin (None -> usuario dev)…, test_list_cycles_without_token() (+1 more)
+### Community 15 - "test_identity_me.py"
+Cohesion: 0.08
+Nodes (18): get_db(), client(), _fake_db(), _EmptyScalars, _FakeSession, fixture, TestClient, GET /identity/me devuelve el perfil del usuario autenticado (nombre, correo,… (+10 more)
 
 ### Community 17 - "9. Capacidades transversales"
 Cohesion: 0.33
@@ -182,103 +177,91 @@ Nodes (3): 5.1 Requerimientos de marca, 5.2 Insumos pendientes de marca, 5. Bran
 
 ### Community 34 - "MasterDataPage.tsx"
 Cohesion: 0.10
-Nodes (20): Drawer(), CheckboxGroup(), CheckboxGroupProps, FormField(), FormFieldProps, Option, ColumnSpec, FieldOption (+12 more)
+Nodes (21): Drawer(), CheckboxGroup(), CheckboxGroupProps, FormField(), FormFieldProps, Option, ColumnSpec, FieldOption (+13 more)
 
 ### Community 35 - "UsersPage.tsx"
 Cohesion: 0.10
 Nodes (18): DOT, STATUSES, StatusSelect(), StatusSelectProps, UserStatus, TempPasswordCallout(), EMPTY_FORM, formFromUser() (+10 more)
 
 ### Community 36 - "MasterDataPage"
-Cohesion: 0.15
-Nodes (15): apiPatchJson(), apiPostJson(), MasterDataPage(), changeStatus(), emptyValues(), handleSubmit(), openCreate(), openEdit() (+7 more)
+Cohesion: 0.16
+Nodes (12): apiPatchJson(), MasterDataPage(), changeStatus(), emptyValues(), handleSubmit(), openCreate(), openEdit(), payload() (+4 more)
 
 ### Community 37 - "brand-tokens.ts"
-Cohesion: 0.20
-Nodes (11): DrawerProps, LanguageToggle(), Tone, TONES, NAV_GROUPS, NavGroup, NavItem, Sidebar() (+3 more)
-
-### Community 38 - "_domain_errors"
-Cohesion: 0.16
-Nodes (19): _domain_errors(), UUID, Envuelve la llamada al servicio traduciendo excepciones de dominio a HTTP., set_user_status(), update_catalog_value(), update_facility(), update_position(), update_profession() (+11 more)
-
-### Community 39 - "identity/router.py"
 Cohesion: 0.15
-Nodes (15): Punto único de registro de routers. Al agregar un módulo nuevo, se agrega su…, list_permissions(), list_positions(), list_professionals(), list_users(), me(), get, Perfil del usuario autenticado. Solo requiere sesión válida, no un permiso… (+7 more)
+Nodes (16): login(), LoginPage(), handleSubmit(), DrawerProps, LanguageToggle(), StatusBadge(), Tone, toneFor() (+8 more)
+
+### Community 38 - "ucca/router.py"
+Cohesion: 0.14
+Nodes (29): domain_errors(), Envuelve la llamada al servicio traduciendo excepciones de dominio a HTTP., Chequeo defensivo a nivel de aplicación; la RLS de base de datos es la barrera…, require_facility_access(), approve_result(), create_criterion(), create_cycle(), list_criteria() (+21 more)
+
+### Community 39 - "test_criteria.py"
+Cohesion: 0.26
+Nodes (11): _audit_events(), _criterion(), Criterios de evaluación (UCCA): listar, crear, editar y activar/inactivar desde…, test_create_criterion_duplicate_code_is_409(), test_create_criterion_links_current_version_and_audits(), test_create_criterion_without_template_version_is_422(), test_list_criteria_exposes_five_fields_and_status(), test_list_criteria_only_active_filter() (+3 more)
 
 ### Community 40 - "make_client"
-Cohesion: 0.19
-Nodes (16): CatalogValue, Catálogo genérico configurable (estados, severidades, categorías, ...).…, list_catalog_values(), make_client(), TestClient con AUTH_DISABLED y el usuario dev fijo con los permisos dados., _audit_actions(), CRUD de datos maestros M02 (cargos, centros, profesiones, catálogos): crear,…, test_create_catalog_value_and_conflict() (+8 more)
+Cohesion: 0.23
+Nodes (13): make_client(), TestClient con AUTH_DISABLED y el usuario dev fijo con los permisos dados., _audit_actions(), CRUD de datos maestros M02 (cargos, centros, profesiones, catálogos): crear,…, test_create_catalog_value_and_conflict(), test_create_facility_with_director(), test_create_position(), test_create_position_duplicate_title() (+5 more)
 
 ### Community 41 - "App.tsx"
-Cohesion: 0.15
-Nodes (12): App(), AppShell(), FacilitiesPage(), Facility, Position, PositionsPage(), Profession, ProfessionsPage() (+4 more)
+Cohesion: 0.13
+Nodes (14): App(), AppShell(), CriteriaPage(), Criterion, FacilitiesPage(), Facility, Position, PositionsPage() (+6 more)
 
 ### Community 42 - "FakeSession"
 Cohesion: 0.18
-Nodes (9): FakeSession, `scalar_results` se consume en orden (uno por llamada a .scalar()); cuando se…, Roles + matriz rol→permiso (M01 doc, tablas 5/6/8): editar un rol reemplaza sus…, _role(), test_create_role_with_permissions(), test_list_permissions_grouped_by_module(), test_system_administrator_keeps_all_permissions(), test_unknown_permission_id_rejected() (+1 more)
+Nodes (8): FakeSession, `scalar_results` se consume en orden (uno por llamada a .scalar()); cuando se…, PATCH /identity/users/{id}: edición parcial con reemplazo de centros/roles y…, test_status_enum(), test_status_invalid_value(), test_update_unknown_user_404(), test_update_user_fields_and_roles(), _user()
 
 ### Community 43 - "useAuth"
 Cohesion: 0.21
-Nodes (11): AuthContext, AuthContextValue, AuthProvider(), Session, useAuth(), initialsOf(), ProfileMenu(), useCanManage() (+3 more)
+Nodes (10): AuthContext, AuthContextValue, AuthProvider(), Session, useAuth(), initialsOf(), ProfileMenu(), useCanManage() (+2 more)
 
 ### Community 44 - "AEGIS Phase 1 — Module 1: User, Organization & Access Management"
 Cohesion: 0.14
 Nodes (13): 10. Future Expansion, 1. Purpose, 2. Business Process, 3. Database Tables, 4. Field Definitions, 5. Relationships, 6. Business Rules, 7. Workflow (+5 more)
 
 ### Community 45 - "cleanup"
-Cohesion: 0.18
-Nodes (11): cleanup(), _cleanup(), fixture, Smoke: todos los listados de identity responden 200 con sesión vacía. Protege…, test_list_endpoints_respond(), _cleanup(), fixture, _cleanup() (+3 more)
+Cohesion: 0.15
+Nodes (13): cleanup(), _cleanup(), fixture, _cleanup(), fixture, Smoke: todos los listados de identity responden 200 con sesión vacía. Protege…, test_list_endpoints_respond(), _cleanup() (+5 more)
 
-### Community 46 - "client.ts"
-Cohesion: 0.26
-Nodes (9): ApiError, apiFetch(), apiFetchJson(), AUTH_DISABLED, authorizedFetch(), login(), LoginResponse, LoginPage() (+1 more)
+### Community 46 - "UccaEvaluatePage.tsx"
+Cohesion: 0.15
+Nodes (17): ApiError, apiFetch(), apiFetchJson(), apiPostJson(), AUTH_DISABLED, authorizedFetch(), LoginResponse, Criterion (+9 more)
 
-### Community 47 - "audit.py"
-Cohesion: 0.24
-Nodes (7): Audit ledger inmutable (M10 — sección 7 de la arquitectura técnica).…, _CapturingSession, record_event debe serializar previous/new_values a JSON antes del bind: la…, test_record_event_keeps_null_values(), test_record_event_serializes_json_values(), datetime, json
+### Community 47 - "test_roles.py"
+Cohesion: 0.21
+Nodes (11): _cleanup(), fixture, Roles + matriz rol→permiso (M01 doc, tablas 5/6/8): editar un rol reemplaza sus…, _role(), test_create_role_with_permissions(), test_list_permissions_grouped_by_module(), test_system_administrator_keeps_all_permissions(), test_unknown_permission_id_rejected() (+3 more)
 
 ### Community 48 - "test_users_create.py"
 Cohesion: 0.27
 Nodes (10): verify_password(), authenticate(), _cleanup(), _payload(), fixture, POST /identity/users — flujo del documento M01: identidad → cargo → centro →…, test_clinician_requires_profession(), test_create_user_requires_facility_and_role() (+2 more)
 
-### Community 49 - "_FakeSession"
-Cohesion: 0.20
-Nodes (5): client(), _fake_db(), _EmptyScalars, _FakeSession, fixture
-
 ### Community 50 - "test_users_status.py"
 Cohesion: 0.31
 Nodes (8): _cleanup(), fixture, UUID, PATCH /identity/users/{id}/status activa / inactiva / suspende una cuenta (M01:…, test_cannot_deactivate_self(), test_deactivate_user(), test_unknown_user_404(), _user()
 
-### Community 51 - "test_users_update.py"
-Cohesion: 0.31
-Nodes (8): _cleanup(), fixture, PATCH /identity/users/{id}: edición parcial con reemplazo de centros/roles y…, test_status_enum(), test_status_invalid_value(), test_update_unknown_user_404(), test_update_user_fields_and_roles(), _user()
-
-### Community 53 - "create_role"
-Cohesion: 0.50
-Nodes (4): create_role(), list_roles(), RoleCreateRequest, RoleOut
-
-### Community 55 - "test_identity_me.py"
-Cohesion: 0.50
-Nodes (3): TestClient, GET /identity/me devuelve el perfil del usuario autenticado (nombre, correo,…, test_me_returns_profile_shape()
+### Community 52 - "_fakes.py"
+Cohesion: 0.18
+Nodes (3): Dobles mínimos de sesión SQLAlchemy para probar routers sin Postgres., Rows, Scalars
 
 ## Knowledge Gaps
-- **195 isolated node(s):** `name`, `private`, `version`, `type`, `dev` (+190 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 361 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **14 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **196 isolated node(s):** `name`, `private`, `version`, `type`, `dev` (+191 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 370 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `Estado de implementación en el arquetipo (2026-09-24)` connect `AEGIS Phase 1 — Module 1: User, Organization & Access Management` to `identity/service.py`, `MasterDataPage`?**
-  _High betweenness centrality (0.312) - this node is a cross-community bridge._
+  _High betweenness centrality (0.310) - this node is a cross-community bridge._
 - **Why does `_validate_user_rules()` connect `identity/service.py` to `AEGIS Phase 1 — Module 1: User, Organization & Access Management`?**
-  _High betweenness centrality (0.306) - this node is a cross-community bridge._
-- **Why does `MasterDataPage()` connect `MasterDataPage` to `MasterDataPage.tsx`, `UccaEvaluatePage.tsx`, `App.tsx`, `useAuth`, `AEGIS Phase 1 — Module 1: User, Organization & Access Management`?**
-  _High betweenness centrality (0.297) - this node is a cross-community bridge._
-- **Are the 30 inferred relationships involving `CurrentUser` (e.g. with `require_facility_access()` and `require_permission()`) actually correct?**
-  _`CurrentUser` has 30 INFERRED edges - model-reasoned connections that need verification._
+  _High betweenness centrality (0.305) - this node is a cross-community bridge._
+- **Why does `MasterDataPage()` connect `MasterDataPage` to `MasterDataPage.tsx`, `useApiList`, `App.tsx`, `useAuth`, `AEGIS Phase 1 — Module 1: User, Organization & Access Management`, `UccaEvaluatePage.tsx`?**
+  _High betweenness centrality (0.296) - this node is a cross-community bridge._
+- **Are the 32 inferred relationships involving `CurrentUser` (e.g. with `require_facility_access()` and `require_permission()`) actually correct?**
+  _`CurrentUser` has 32 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 16 inferred relationships involving `User` (e.g. with `_dev_bypass_user()` and `authenticate()`) actually correct?**
   _`User` has 16 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 4 inferred relationships involving `Base` (e.g. with `downgrade()` and `upgrade()`) actually correct?**
   _`Base` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `name`, `private`, `version` to the rest of the system?**
-  _195 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _196 weakly-connected nodes found - possible documentation gaps or missing edges._

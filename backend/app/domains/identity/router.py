@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.core.database import get_db
 from app.core.deps import CurrentUser, get_current_user
+from app.core.master_data import domain_errors
 from app.core.rbac import require_permission
 from app.core.security import create_access_token
 from app.domains.identity import schemas, service
@@ -184,16 +185,7 @@ def update_user(
 # ---------------------------------------------------------------------------
 
 
-def _domain_errors(fn):
-    """Envuelve la llamada al servicio traduciendo excepciones de dominio a HTTP."""
-    try:
-        return fn()
-    except LookupError as exc:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
-    except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
-    except PermissionError as exc:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc)) from exc
+_domain_errors = domain_errors
 
 
 @router.post("/positions", response_model=schemas.PositionOut, status_code=status.HTTP_201_CREATED)

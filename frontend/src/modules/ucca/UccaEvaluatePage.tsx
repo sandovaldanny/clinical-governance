@@ -11,13 +11,21 @@ import { useAuth } from "../../auth/AuthContext";
 import { brandTokens } from "../../theme/brand-tokens";
 
 type Cycle = { id: string; facility_id: string; period_label: string; status: string };
-type Criterion = { id: string; code: string; description: string; severity: string };
+type Criterion = {
+  id: string;
+  code: string;
+  domain: string;
+  universal_question: string;
+  profession_interpretation: string;
+  examples_evidence: string;
+  is_active: boolean;
+};
 type Professional = { id: string; full_name: string; profession_name: string; primary_facility_id: string };
 type Facility = { id: string; name: string };
 type ResultRow = {
   id: string;
   criterion_code: string;
-  criterion_description: string;
+  criterion_domain: string;
   professional_name: string;
   outcome: string;
   status: string;
@@ -35,7 +43,7 @@ export function UccaEvaluatePage() {
   const { session } = useAuth();
 
   const cycles = useApiList<Cycle>("/ucca/cycles");
-  const criteria = useApiList<Criterion>("/ucca/criteria");
+  const criteria = useApiList<Criterion>("/ucca/criteria?only_active=true");
   const professionals = useApiList<Professional>("/identity/professionals");
   const facilities = useApiList<Facility>("/identity/facilities");
   const results = useApiList<ResultRow>(`/ucca/results?cycle_id=${cycleId ?? ""}`);
@@ -61,10 +69,7 @@ export function UccaEvaluatePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!criterionId && criteria.data.length > 0) {
-      const doc001 = criteria.data.find((c) => c.code === "DOC-001");
-      setCriterionId(doc001?.id ?? criteria.data[0].id);
-    }
+    if (!criterionId && criteria.data.length > 0) setCriterionId(criteria.data[0].id);
   }, [criteria.data, criterionId]);
 
   useEffect(() => {
@@ -138,11 +143,42 @@ export function UccaEvaluatePage() {
             <select value={criterionId} onChange={(e) => setCriterionId(e.target.value)} required>
               {criteria.data.map((c) => (
                 <option key={c.id} value={c.id}>
-                  {c.code} — {c.description}
+                  {c.code} — {c.domain}
                 </option>
               ))}
             </select>
           </label>
+
+          {selectedCriterion && (
+            <div
+              style={{
+                display: "grid",
+                gap: 10,
+                padding: "14px 16px",
+                borderRadius: brandTokens.radius.md,
+                background: brandTokens.colors.background,
+                border: `1px solid ${brandTokens.colors.border}`,
+                fontSize: 13,
+              }}
+            >
+              <div>
+                <div style={{ fontWeight: 600, color: brandTokens.colors.textPrimary }}>{t("ucca.criterionQuestion")}</div>
+                <div>{selectedCriterion.universal_question}</div>
+              </div>
+              {selectedCriterion.profession_interpretation && (
+                <div>
+                  <div style={{ fontWeight: 600, color: brandTokens.colors.textPrimary }}>{t("ucca.criterionInterpretation")}</div>
+                  <div style={{ color: brandTokens.colors.textSecondary }}>{selectedCriterion.profession_interpretation}</div>
+                </div>
+              )}
+              {selectedCriterion.examples_evidence && (
+                <div>
+                  <div style={{ fontWeight: 600, color: brandTokens.colors.textPrimary }}>{t("ucca.criterionEvidence")}</div>
+                  <div style={{ color: brandTokens.colors.textSecondary }}>{selectedCriterion.examples_evidence}</div>
+                </div>
+              )}
+            </div>
+          )}
 
           <label style={fieldLabel}>
             {t("ucca.professional")}
@@ -203,7 +239,7 @@ export function UccaEvaluatePage() {
           rows={results.data}
           emptyMessage={t("ucca.resultsEmpty")}
           columns={[
-            { key: "code", header: t("ucca.colCriterion"), render: (r) => <code>{r.criterion_code}</code> },
+            { key: "code", header: t("ucca.colCriterion"), render: (r) => <span><code>{r.criterion_code}</code> · {r.criterion_domain}</span> },
             { key: "pro", header: t("ucca.colProfessional"), render: (r) => r.professional_name },
             { key: "out", header: t("ucca.colOutcome"), render: (r) => <StatusBadge code={r.outcome} ns="ucca.outcomes" /> },
             { key: "status", header: t("ucca.colStatus"), render: (r) => <StatusBadge code={r.status} ns="ucca.statuses" /> },

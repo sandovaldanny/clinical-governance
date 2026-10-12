@@ -2,11 +2,10 @@ import { useTranslation } from "react-i18next";
 
 import { DataTable } from "../../components/DataTable";
 import { PageHeader } from "../../components/PageHeader";
-import { StatusBadge } from "../../components/StatusBadge";
 import { useApiList } from "../../hooks/useApiList";
 import { brandTokens } from "../../theme/brand-tokens";
 
-type Criterion = { id: string; code: string; description: string; severity: string };
+type Criterion = { id: string; code: string; domain: string; universal_question: string; is_active: boolean };
 type Catalog = { id: string; code: string; label: string; catalog_type: string };
 
 function SectionTitle({ children }: { children: string }) {
@@ -15,7 +14,7 @@ function SectionTitle({ children }: { children: string }) {
 
 export function IndicatorsPage() {
   const { t } = useTranslation();
-  const ucca = useApiList<Criterion>("/ucca/criteria");
+  const ucca = useApiList<Criterion>("/ucca/criteria?only_active=true");
   const omh001 = useApiList<Catalog>("/identity/catalogs?catalog_type=omh001_investigation");
   const medication = useApiList<Catalog>("/identity/catalogs?catalog_type=medication_class");
 
@@ -34,8 +33,8 @@ export function IndicatorsPage() {
           emptyMessage={t("indicators.uccaEmpty")}
           columns={[
             { key: "code", header: t("indicators.code"), render: (r) => <code>{r.code}</code> },
-            { key: "desc", header: t("indicators.criterion"), render: (r) => r.description },
-            { key: "sev", header: t("indicators.severity"), render: (r) => <StatusBadge code={r.severity} ns="indicators.severities" /> },
+            { key: "domain", header: t("indicators.domain"), render: (r) => r.domain },
+            { key: "question", header: t("indicators.criterion"), render: (r) => r.universal_question },
           ]}
         />
       )}
