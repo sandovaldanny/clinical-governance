@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import uuid
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, func
+from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Integer, Numeric, String, UniqueConstraint, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -63,7 +63,8 @@ class AuditCriterion(Base):
 
 class AuditCycle(Base):
     """Un ciclo/periodo de auditoría para un centro (multi-centro por diseño: facility_id
-    obligatorio + política RLS, ver alembic/versions/0003_rls_policies.py)."""
+    obligatorio + política RLS, ver alembic/versions/0003_rls_policies.py). `year`/`quarter`
+    formalizan el periodo para filtros del dashboard; `period_label` = f"{quarter}-{year}"."""
 
     __tablename__ = "ucca_audit_cycles"
 
@@ -73,19 +74,53 @@ class AuditCycle(Base):
         ForeignKey("ucca_audit_template_versions.id"), nullable=False
     )
     period_label: Mapped[str] = mapped_column(String(50), nullable=False)
+    year: Mapped[int] = mapped_column(Integer, nullable=False)
+    quarter: Mapped[str] = mapped_column(String(2), nullable=False)  # Q1..Q4
     status: Mapped[str] = mapped_column(String(30), default="draft")
     created_by_user_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
     created_at: Mapped["DateTime"] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
-class AuditResult(Base):
-    """Resultado por criterio/profesional. Inmutable una vez `status == approved`
-    (regla global de negocio #1 del funcional) — aplicado a nivel de servicio y de permisos
-    de base de datos, no solo de UI."""
+class ChartAudit(Base):
+    """Auditoría de UN expediente (MRN) de UN profesional dentro de un ciclo = una fila de la
+    hoja Excel UCCA. Las respuestas por criterio viven en AuditResult (chart_audit_id).
+    Score/outcome se guardan calculados (ver scoring.py) y se recalculan en cada guardado
+    mientras status == draft. Aprobada → inmutable (regla global #1)."""
 
-    __tablename__ = "ucca_audit_results"
+    __tablename__ = "ucca_chart_audits"
+    __table_args__ = (
+        UniqueConstraint("cycle_id", "professional_id", "case_reference", name="uq_chart_audit_case"),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=_uuid)
+    cycle_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ucca_audit_cycles.id"), nullable=False)
+    facility_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
+    professional_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("professionals.id"), nullable=False)
+    auditor_user_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
+    case_reference: Mapped[str] = mapped_column(String(80), nullable=False)
+    audit_date: Mapped["Date"] = mapped_column(Date, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default="draft")  # draft -> submitted -> approved
+    applicable_count: Mapped[int] = mapped_column(Integer, default=0)
+    yes_count: Mapped[int] = mapped_column(Integer, default=0)
+    score: Mapped[float | None] = mapped_column(Numeric(5, 2), nullable=True)
+    outcome: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    notes: Mapped[str] = mapped_column(String(1000), default="")
+    created_at: Mapped["DateTime"] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    updated_at: Mapped["DateTime"] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+    )
+
+
+class AuditResult(Base):
+    """Respuesta a UN criterio dentro de una auditoría por expediente (celda CCA…CMC del Excel).
+    facility/cycle/professional/auditor se copian de la cabecera para RLS y consultas por
+    criterio. Inmutable una vez `status == approved` (regla global #1)."""
+
+    __tablename__ = "ucca_audit_results"
+    __table_args__ = (UniqueConstraint("chart_audit_id", "criterion_id", name="uq_result_audit_criterion"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=_uuid)
+    chart_audit_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ucca_chart_audits.id"), nullable=False)
     facility_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
     cycle_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ucca_audit_cycles.id"), nullable=False)
     criterion_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ucca_audit_criteria.id"), nullable=False)
@@ -94,21 +129,23 @@ class AuditResult(Base):
 
     outcome: Mapped[str] = mapped_column(String(30), nullable=False)  # compliant/non_compliant/not_applicable
     not_applicable_reason: Mapped[str | None] = mapped_column(String(500))
+    comment: Mapped[str | None] = mapped_column(String(500))
     evidence_reference: Mapped[str | None] = mapped_column(String(500))
-    status: Mapped[str] = mapped_column(String(30), default="draft")  # draft -> submitted -> approved
+    status: Mapped[str] = mapped_column(String(30), default="draft")  # sincronizado con la cabecera
 
     created_at: Mapped["DateTime"] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
 class Finding(Base):
-    """Un resultado no conforme aprobado puede generar un hallazgo, que M06 (Acciones
-    Correctivas) consume por finding_id — sin copiar los datos del resultado."""
+    """Hallazgo principal (Key Finding) de una auditoría por expediente, o de un resultado
+    concreto. M06 (Acciones Correctivas) lo consume por finding_id sin copiar datos."""
 
     __tablename__ = "ucca_findings"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=_uuid)
     facility_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
-    result_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("ucca_audit_results.id"), nullable=False)
+    chart_audit_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("ucca_chart_audits.id"), nullable=True)
+    result_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("ucca_audit_results.id"), nullable=True)
     description: Mapped[str] = mapped_column(String(1000), nullable=False)
     status: Mapped[str] = mapped_column(String(30), default="open")
     created_at: Mapped["DateTime"] = mapped_column(DateTime(timezone=True), server_default=func.now())

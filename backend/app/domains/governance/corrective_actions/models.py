@@ -25,4 +25,7 @@ class CorrectiveAction(Base):
     responsible_user_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
     due_date: Mapped["DateTime"] = mapped_column(DateTime(timezone=True), nullable=False)
     status: Mapped[str] = mapped_column(String(30), default="assigned")
+    description: Mapped[str] = mapped_column(String(1000), nullable=False, default="")
+    closure_evidence: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    closed_at: Mapped["DateTime"] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped["DateTime"] = mapped_column(DateTime(timezone=True), server_default=func.now())
