@@ -137,7 +137,8 @@
     "actionStatuses": {
       "assigned": "Asignada",
       "in_progress": "En curso",
-      "closed": "Cerrada"
+      "closed": "Cerrada",
+      "cancelled": "Cancelada"
     },
     "form": {
       "newTitle": "Auditar expediente",

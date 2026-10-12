@@ -54,6 +54,8 @@ Reglas adicionales:
   Yes ÷ (Yes + No), N/A excluidos. Score por profesional = media de sus expedientes; outcome del
   promedio con las mismas bandas. Tendencia = media por (año, trimestre).
 - Orden de presentación de criterios: `CRITERIA_ORDER` (CCA, CRS, CTP, COM, CDC, CEP, CMC).
+- Quitar el hallazgo de un borrador lo deja `withdrawn` y cancela su acción (`cancelled`); nada se
+  borra, todo queda en `audit_events`. Hallazgos retirados y acciones canceladas no cuentan en KPIs.
 
 ## Mapa Excel → AEGIS
 
@@ -93,6 +95,7 @@ Reglas adicionales:
 | API auditorías, ciclos, summary, dashboard + tests | ✅ |
 | UI: ciclos, página del ciclo, formulario, dashboard, panel de reglas | ✅ |
 | Seed demo (Q2-2026, 6 expedientes, 1 hallazgo + acción) | ✅ |
+| Seguimiento de acciones correctivas tras aprobar (cerrar/avanzar estado, evidencia de cierre) | ⏳ pendiente — API M06 `PATCH /corrective_actions/{id}`; hoy solo editable mientras la auditoría está en borrador |
 | Capa OMH / JAWDA (indicadores regulatorios) | ⏳ pendiente |
 | Exportación a Excel | ⏳ pendiente |
 | Umbrales de outcome configurables por catálogo | ⏳ pendiente (constante `OUTCOME_BANDS`) |

@@ -222,14 +222,17 @@ def test_submit_then_approve(monkeypatch):
     cycle, criteria = _cycle(), _criteria()
     audit = _existing_audit(cycle)
     results = _existing_results(audit, criteria)
-    # submit: scalar #1 auditoría · scalars #1 resultados · (detalle) scalar #2 profesional, #3 auditor name, scalars #2 answers rows, scalar #4 finding
-    session = FakeSession(scalar_results=[audit, _PRO, "Dev", None], scalars_results=[results, []])
+    # submit: scalar #1 auditoría · scalars #1 resultados · (detalle) scalar #2 profesional, #3 auditor name,
+    # #4 nombre profesión, scalars #2 respuestas, scalars #3 criterios, scalar #5 finding (None)
+    session = FakeSession(scalar_results=[audit, _PRO, "Dev", "Psychiatry", None], scalars_results=[results, results, criteria])
     client = make_client(monkeypatch, session, PERMS)
     r = client.post(f"/ucca/audits/{audit.id}/submit")
-    assert r.status_code == 200, r.text and r.json()["status"] == "submitted"
+    assert r.status_code == 200, r.text
+    assert r.json()["status"] == "submitted" and r.json()["profession_name"] == "Psychiatry"
+    assert [a["criterion_code"] for a in r.json()["answers"]] == CODES
     assert all(res.status == "submitted" for res in results)
 
-    session = FakeSession(scalar_results=[audit, _PRO, "Dev", None], scalars_results=[results, []])
+    session = FakeSession(scalar_results=[audit, _PRO, "Dev", "Psychiatry", None], scalars_results=[results, results, criteria])
     client = make_client(monkeypatch, session, PERMS)
     r = client.post(f"/ucca/audits/{audit.id}/approve")
     assert r.status_code == 200, r.text
@@ -258,3 +261,57 @@ def test_list_chart_audits_rows(monkeypatch):
     assert row["employee_number"] == "CL-0029" and row["profession_name"] == "Psychiatrist"
     assert row["answers"] == {c: "compliant" for c in CODES}
     assert row["score"] == 100.0 and row["outcome"] == "compliant" and row["has_finding"] is False
+
+
+def _finding_and_action(audit, status="assigned"):
+    from app.domains.governance.corrective_actions.models import CorrectiveAction
+    from app.domains.governance.ucca.models import Finding
+
+    finding = Finding(id=uuid.uuid4(), facility_id=FACILITY, chart_audit_id=audit.id, description="Gap", status="open")
+    action = CorrectiveAction(id=uuid.uuid4(), facility_id=FACILITY, source_module="ucca", source_finding_id=finding.id,
+                              responsible_user_id=uuid.uuid4(), due_date=date(2026, 8, 30), status=status,
+                              description="Retrain", closure_evidence=None, closed_at=None)
+    return finding, action
+
+
+def test_update_without_finding_withdraws_it_and_cancels_action(monkeypatch):
+    cycle, criteria = _cycle(), _criteria()
+    audit = _existing_audit(cycle)
+    finding, action = _finding_and_action(audit)
+    # scalar #1 auditoría · #2 ciclo · #3 profesional · #4 duplicado · scalars #1 criterios · #2 resultados
+    # · scalar #5 finding previo · #6 acción previa
+    session = FakeSession(scalar_results=[audit, cycle, _PRO, None, finding, action],
+                          scalars_results=[criteria, _existing_results(audit, criteria)])
+    client = make_client(monkeypatch, session, PERMS)
+    r = client.patch(f"/ucca/audits/{audit.id}", json=_payload(criteria, ["compliant"] * 7))
+    assert r.status_code == 200, r.text
+    assert r.json()["finding"] is None
+    assert finding.status == "withdrawn" and action.status == "cancelled"
+    assert any(e["entity_type"] == "CorrectiveAction" and e["action"] == "cancel" for e in _events(session))
+
+
+def test_update_dropping_action_cancels_it(monkeypatch):
+    cycle, criteria = _cycle(), _criteria()
+    audit = _existing_audit(cycle)
+    finding, action = _finding_and_action(audit)
+    session = FakeSession(scalar_results=[audit, cycle, _PRO, None, finding, action],
+                          scalars_results=[criteria, _existing_results(audit, criteria)])
+    client = make_client(monkeypatch, session, PERMS)
+    outcomes = ["compliant"] * 6 + ["non_compliant"]
+    r = client.patch(f"/ucca/audits/{audit.id}", json=_payload(criteria, outcomes, {"description": "Gap", "corrective_action": None}))
+    assert r.status_code == 200, r.text
+    assert finding.status == "open" and action.status == "cancelled"
+    assert r.json()["finding"]["corrective_action"] is None
+
+
+def test_detail_hides_withdrawn_finding(monkeypatch):
+    cycle, criteria = _cycle(), _criteria()
+    audit = _existing_audit(cycle)
+    finding, _ = _finding_and_action(audit)
+    finding.status = "withdrawn"
+    # scalar #1 auditoría · #2 profesional · #3 auditor · #4 profesión · scalars #1 respuestas · #2 criterios · scalar #5 finding
+    session = FakeSession(scalar_results=[audit, _PRO, "Dev", "Psychiatry", finding], scalars_results=[[], []])
+    client = make_client(monkeypatch, session, PERMS)
+    r = client.get(f"/ucca/audits/{audit.id}")
+    assert r.status_code == 200, r.text
+    assert r.json()["finding"] is None

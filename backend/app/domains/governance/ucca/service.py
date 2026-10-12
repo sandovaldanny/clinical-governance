@@ -237,15 +237,30 @@ def _write_answers(db: Session, audit: ChartAudit, by_id: dict, payload: ChartAu
         )
 
 
+def _cancel_action(db: Session, *, actor_user_id: uuid.UUID, action: CorrectiveAction | None, reason: str) -> None:
+    """Una acción correctiva nunca se borra: pasa a 'cancelled' y queda en el ledger."""
+    if action is None or action.status in ("cancelled", "closed"):
+        return
+    previous = action.status
+    action.status = "cancelled"
+    record_event(db, actor_user_id=str(actor_user_id), module="corrective_actions", entity_type="CorrectiveAction",
+                 entity_id=str(action.id), action="cancel",
+                 previous_values={"status": previous}, new_values={"status": "cancelled", "reason": reason})
+
+
 def _sync_finding(db: Session, *, actor_user_id: uuid.UUID, audit: ChartAudit, payload: ChartAuditWriteRequest,
                   existing: Finding | None) -> None:
     """Crea/actualiza el hallazgo de expediente y su acción correctiva según el payload.
-    Si el payload no trae hallazgo y existía uno, se cierra como 'withdrawn' (no se borra)."""
+    Sin hallazgo en el payload → el existente pasa a 'withdrawn' y su acción a 'cancelled' (nunca se
+    borran). Con hallazgo pero sin acción → la acción existente se cancela.
+    Orden de consultas: scalar acción previa (solo si había hallazgo o se envía uno)."""
     if payload.finding is None:
         if existing is not None and existing.status != "withdrawn":
             existing.status = "withdrawn"
             record_event(db, actor_user_id=str(actor_user_id), module="ucca", entity_type="Finding",
                          entity_id=str(existing.id), action="withdraw", new_values={"status": "withdrawn"})
+            previous_action = db.scalar(select(CorrectiveAction).where(CorrectiveAction.source_finding_id == existing.id))  # scalar: acción previa
+            _cancel_action(db, actor_user_id=actor_user_id, action=previous_action, reason="finding withdrawn")
         return
     finding = existing
     if finding is None:
@@ -258,7 +273,8 @@ def _sync_finding(db: Session, *, actor_user_id: uuid.UUID, audit: ChartAudit, p
     else:
         previous = finding.description
         finding.description = payload.finding.description.strip()
-        finding.status = "open"
+        if finding.status == "withdrawn":
+            finding.status = "open"
         if previous != finding.description:
             record_event(db, actor_user_id=str(actor_user_id), module="ucca", entity_type="Finding",
                          entity_id=str(finding.id), action="update",
@@ -266,9 +282,10 @@ def _sync_finding(db: Session, *, actor_user_id: uuid.UUID, audit: ChartAudit, p
     action_in = payload.finding.corrective_action
     action = db.scalar(select(CorrectiveAction).where(CorrectiveAction.source_finding_id == finding.id))  # scalar: acción previa
     if action_in is None:
+        _cancel_action(db, actor_user_id=actor_user_id, action=action, reason="corrective action removed")
         return
-    closed_at = datetime.now(timezone.utc) if action_in.status == "closed" else None
-    if action is None:
+    if action is None or action.status == "cancelled":
+        closed_at = datetime.now(timezone.utc) if action_in.status == "closed" else None
         action = CorrectiveAction(
             facility_id=audit.facility_id, source_module="ucca", source_finding_id=finding.id,
             responsible_user_id=action_in.responsible_user_id, due_date=action_in.due_date,
@@ -285,17 +302,18 @@ def _sync_finding(db: Session, *, actor_user_id: uuid.UUID, audit: ChartAudit, p
         previous = {"description": action.description, "status": action.status,
                     "responsible_user_id": str(action.responsible_user_id), "due_date": str(action.due_date)}
         action.description = action_in.description.strip()
-        action.status = action_in.status
         action.responsible_user_id = action_in.responsible_user_id
         action.due_date = action_in.due_date
         action.closure_evidence = action_in.closure_evidence
-        action.closed_at = closed_at
+        if action_in.status != action.status:
+            action.status = action_in.status
+            action.closed_at = datetime.now(timezone.utc) if action_in.status == "closed" else None
         new = {"description": action.description, "status": action.status,
                "responsible_user_id": str(action.responsible_user_id), "due_date": str(action.due_date)}
         if new != previous:
             record_event(db, actor_user_id=str(actor_user_id), module="corrective_actions", entity_type="CorrectiveAction",
                          entity_id=str(action.id), action="update", previous_values=previous, new_values=new)
-    if finding.status == "open" and action.status == "closed":
+    if action.status == "closed" and finding.status == "open":
         finding.status = "closed"
 
 
@@ -401,7 +419,7 @@ def _finding_out(db: Session, finding: Finding | None) -> dict | None:
         return None
     action = db.scalar(select(CorrectiveAction).where(CorrectiveAction.source_finding_id == finding.id))
     action_out = None
-    if action is not None:
+    if action is not None and action.status != "cancelled":
         responsible = db.scalar(select(User.full_name).where(User.id == action.responsible_user_id))
         action_out = {"id": action.id, "description": action.description, "responsible_user_id": action.responsible_user_id,
                       "responsible_name": responsible, "due_date": action.due_date, "status": action.status,
@@ -455,7 +473,9 @@ def chart_audit_detail(db: Session, audit: ChartAudit) -> dict:
           "not_applicable_reason": r.not_applicable_reason, "comment": r.comment} for r in rows],
         key=lambda a: criterion_sort_key(a["criterion_code"]),
     )
-    finding = db.scalar(select(Finding).where(Finding.chart_audit_id == audit.id))
+    finding = db.scalar(select(Finding).where(Finding.chart_audit_id == audit.id, Finding.status != "withdrawn"))
+    if finding is not None and finding.status == "withdrawn":
+        finding = None
     return {
         "id": audit.id, "cycle_id": audit.cycle_id, "facility_id": audit.facility_id,
         "professional_id": audit.professional_id,
@@ -485,7 +505,9 @@ def list_chart_audits(db: Session, *, cycle_id: uuid.UUID) -> list[dict]:
         .where(AuditResult.cycle_id == cycle_id)
     ).all()
     finding_rows = db.execute(
-        select(Finding.chart_audit_id).where(Finding.chart_audit_id.is_not(None), Finding.status != "withdrawn")
+        select(Finding.chart_audit_id)
+        .join(ChartAudit, ChartAudit.id == Finding.chart_audit_id)
+        .where(ChartAudit.cycle_id == cycle_id, Finding.status != "withdrawn")
     ).all()
     answers: dict[uuid.UUID, dict[str, str]] = {}
     for audit_id, code, outcome in answer_rows:
@@ -555,7 +577,8 @@ def _load_summary_rows(db: Session, *, cycle_ids: list[uuid.UUID] | None, facili
                 .join(ChartAudit, ChartAudit.id == Finding.chart_audit_id)
                 .join(Professional, Professional.id == ChartAudit.professional_id)
                 .join(User, User.id == CorrectiveAction.responsible_user_id, isouter=True)
-                .where(Finding.chart_audit_id.in_(ids), CorrectiveAction.status != "closed")
+                .where(Finding.chart_audit_id.in_(ids), Finding.status != "withdrawn",
+                       CorrectiveAction.status.not_in(("closed", "cancelled")))
                 .order_by(CorrectiveAction.due_date)
             ).all()
         ]

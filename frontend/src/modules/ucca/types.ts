@@ -30,7 +30,7 @@ export type ChartAuditWrite = {
 };
 
 export type AnswerOut = AnswerIn & { criterion_code: string };
-export type CorrectiveActionOut = CorrectiveActionIn & { id: string; responsible_name: string | null };
+export type CorrectiveActionOut = Omit<CorrectiveActionIn, "status"> & { id: string; responsible_name: string | null; status: ActionStatus | "cancelled" };
 export type FindingOut = { id: string; description: string; status: string; corrective_action: CorrectiveActionOut | null };
 
 export type ChartAudit = {

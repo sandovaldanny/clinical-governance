@@ -137,6 +137,8 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "audit.read",
     ],
     "medical_director": [
+        "users.view",
+        "ucca.create",
         "ucca.approve",
         "ucca.view",
         "medication.manage",
@@ -146,6 +148,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "reports.view",
     ],
     "quality_manager": [
+        "users.view",
         "ucca.create",
         "ucca.approve",
         "ucca.view",
@@ -155,7 +158,7 @@ ROLE_PERMISSIONS: dict[str, list[str]] = {
         "reports.view",
         "audit.read",
     ],
-    "auditor": ["ucca.create", "ucca.view", "medication.view", "corrective_actions.view"],
+    "auditor": ["users.view", "ucca.create", "ucca.view", "medication.view", "corrective_actions.view"],
     "reviewer": ["ucca.view", "corrective_actions.view", "reports.view"],
     "approver": ["ucca.approve", "corrective_actions.manage", "reports.publish"],
     "clinician": ["ucca.view", "corrective_actions.view"],

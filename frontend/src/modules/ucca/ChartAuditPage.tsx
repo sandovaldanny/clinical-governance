@@ -15,7 +15,7 @@ import { EvaluationRules } from "./components/EvaluationRules";
 import { EMPTY_FINDING, FindingSection, type FindingState } from "./components/FindingSection";
 import { ScoreBar } from "./components/ScoreBar";
 import { computeScore } from "./scoring";
-import type { AnswerValue, ChartAudit, ChartAuditWrite, Criterion, Cycle, Professional } from "./types";
+import type { ActionStatus, AnswerValue, ChartAudit, ChartAuditWrite, Criterion, Cycle, Professional } from "./types";
 
 type Owner = { id: string; full_name: string; status?: string };
 
@@ -65,17 +65,25 @@ export function ChartAuditPage() {
     setAuditDate(a.audit_date);
     setNotes(a.notes);
     setAnswers(Object.fromEntries(a.answers.map((x) => [x.criterion_id, { outcome: x.outcome, reason: x.not_applicable_reason ?? "", comment: x.comment ?? "" }])));
-    if (a.finding) {
-      const ca = a.finding.corrective_action;
+    if (a.finding && a.finding.status !== "withdrawn") {
+      const ca = a.finding.corrective_action && a.finding.corrective_action.status !== "cancelled" ? a.finding.corrective_action : null;
       setFinding({ enabled: true, description: a.finding.description, actionEnabled: Boolean(ca), actionDescription: ca?.description ?? "",
-                   ownerId: ca?.responsible_user_id ?? "", dueDate: ca?.due_date ?? "", actionStatus: ca?.status ?? "assigned",
+                   ownerId: ca?.responsible_user_id ?? "", dueDate: ca?.due_date ?? "", actionStatus: (ca?.status as ActionStatus | undefined) ?? "assigned",
                    closureEvidence: ca?.closure_evidence ?? "" });
+    } else {
+      setFinding(EMPTY_FINDING);
     }
   }, [existing.data]);
 
   const status = existing.data?.status ?? "draft";
   const readOnly = status !== "draft" || !canCreate;
   const professional = professionals.data.find((p) => p.id === professionalId);
+  // En solo lectura (o sin permiso users.view) los datos del profesional vienen de la propia auditoría.
+  const shown = {
+    name: professional?.full_name ?? existing.data?.professional_name ?? "",
+    employeeNumber: professional?.employee_number ?? existing.data?.employee_number ?? "",
+    profession: professional?.profession_name ?? existing.data?.profession_name ?? "",
+  };
   const facilityProfessionals = useMemo(
     () => professionals.data.filter((p) => p.primary_facility_id === cycle?.facility_id && p.is_active !== false),
     [professionals.data, cycle?.facility_id],
@@ -162,13 +170,17 @@ export function ChartAuditPage() {
           <h2 style={{ fontSize: 17, margin: "0 0 14px" }}>{t("ucca.form.dataSection")}</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0 16px" }}>
             <FormField label={t("ucca.form.professional")} required>
-              <select value={professionalId} disabled={readOnly} required onChange={(e) => setProfessionalId(e.target.value)}>
-                <option value="">{t("ucca.form.professionalPlaceholder")}</option>
-                {facilityProfessionals.map((p) => <option key={p.id} value={p.id}>{p.full_name} · {p.profession_name}</option>)}
-              </select>
+              {readOnly ? (
+                <input value={shown.name} readOnly />
+              ) : (
+                <select value={professionalId} required onChange={(e) => setProfessionalId(e.target.value)}>
+                  <option value="">{t("ucca.form.professionalPlaceholder")}</option>
+                  {facilityProfessionals.map((p) => <option key={p.id} value={p.id}>{p.full_name} · {p.profession_name}</option>)}
+                </select>
+              )}
             </FormField>
-            <FormField label={t("ucca.form.cgId")}><input value={professional?.employee_number ?? ""} readOnly /></FormField>
-            <FormField label={t("ucca.form.profession")}><input value={professional?.profession_name ?? ""} readOnly /></FormField>
+            <FormField label={t("ucca.form.cgId")}><input value={shown.employeeNumber} readOnly /></FormField>
+            <FormField label={t("ucca.form.profession")}><input value={shown.profession} readOnly /></FormField>
             <FormField label={t("ucca.form.mrn")} required>
               <input value={caseRef} disabled={readOnly} required placeholder={t("ucca.form.mrnPlaceholder")} onChange={(e) => setCaseRef(e.target.value)} />
             </FormField>

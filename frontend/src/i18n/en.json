@@ -137,7 +137,8 @@
     "actionStatuses": {
       "assigned": "Assigned",
       "in_progress": "In progress",
-      "closed": "Closed"
+      "closed": "Closed",
+      "cancelled": "Cancelled"
     },
     "form": {
       "newTitle": "Audit chart",
