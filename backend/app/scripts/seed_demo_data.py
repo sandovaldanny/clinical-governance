@@ -671,6 +671,8 @@ def _seed_sample_cycle(
             facility_id=facility.id,
             template_version_id=template_version.id,
             period_label="Q3-2026",
+            year=2026,
+            quarter="Q3",
             status="draft",
             created_by_user_id=admin.id,
         )

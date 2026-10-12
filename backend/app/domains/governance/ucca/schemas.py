@@ -7,19 +7,26 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 
+Quarter = Literal["Q1", "Q2", "Q3", "Q4"]
+
+
 class AuditCycleCreateRequest(BaseModel):
     facility_id: uuid.UUID
-    template_version_id: uuid.UUID
-    period_label: str
+    year: int = Field(ge=2020, le=2100)
+    quarter: Quarter
 
 
 class AuditCycleOut(BaseModel):
     id: uuid.UUID
     facility_id: uuid.UUID
+    facility_name: str | None = None
+    template_version_id: uuid.UUID
     period_label: str
+    year: int
+    quarter: str
     status: str
-
-    model_config = ConfigDict(from_attributes=True)
+    audits_count: int = 0
+    average_score: float | None = None
 
 
 AnswerValue = Literal["compliant", "non_compliant", "not_applicable"]

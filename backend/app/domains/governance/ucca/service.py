@@ -11,7 +11,7 @@ import uuid
 from datetime import datetime, timezone
 
 from fastapi import HTTPException, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.audit import record_event
@@ -27,34 +27,43 @@ from app.domains.governance.ucca.models import (
 )
 from app.domains.governance.ucca.schemas import ChartAuditWriteRequest
 from app.domains.governance.ucca.scoring import ANSWER_NA, ANSWER_NO, compute_score
-from app.domains.identity.models import Profession, Professional, User
+from app.domains.identity.models import Facility, Profession, Professional, User
 
 
-def create_cycle(
-    db: Session, *, actor_user_id: uuid.UUID, facility_id: uuid.UUID, template_version_id: uuid.UUID,
-    period_label: str,
-) -> AuditCycle:
+def _cycle_out(cycle: AuditCycle, facility_name: str | None, audits_count: int, average_score) -> dict:
+    return {
+        "id": cycle.id, "facility_id": cycle.facility_id, "facility_name": facility_name,
+        "template_version_id": cycle.template_version_id, "period_label": cycle.period_label,
+        "year": cycle.year, "quarter": cycle.quarter, "status": cycle.status,
+        "audits_count": int(audits_count or 0),
+        "average_score": None if average_score is None else round(float(average_score), 2),
+    }
+
+
+def create_cycle(db: Session, *, actor_user_id: uuid.UUID, facility_id: uuid.UUID, year: int, quarter: str) -> dict:
+    """Un ciclo por centro + año + trimestre; `period_label` se deriva ("Q2-2026").
+    Orden de consultas: duplicado · versión vigente · nombre del centro."""
+    duplicate = db.scalar(
+        select(AuditCycle).where(AuditCycle.facility_id == facility_id, AuditCycle.year == year, AuditCycle.quarter == quarter)
+    )
+    if duplicate:
+        raise PermissionError(f"Ya existe un ciclo {quarter}-{year} para este centro.")
+    version = _current_template_version(db)
+    if not version:
+        raise ValueError("No hay una versión de plantilla UCCA vigente; ejecute el seed primero.")
+    facility_name = db.scalar(select(Facility.name).where(Facility.id == facility_id))
     cycle = AuditCycle(
-        facility_id=facility_id,
-        template_version_id=template_version_id,
-        period_label=period_label,
-        status="draft",
-        created_by_user_id=actor_user_id,
+        facility_id=facility_id, template_version_id=version.id, period_label=f"{quarter}-{year}",
+        year=year, quarter=quarter, status="draft", created_by_user_id=actor_user_id,
     )
     db.add(cycle)
     db.flush()
-    record_event(
-        db,
-        actor_user_id=str(actor_user_id),
-        module="ucca",
-        entity_type="AuditCycle",
-        entity_id=str(cycle.id),
-        action="create",
-        new_values={"facility_id": str(facility_id), "period_label": period_label},
-    )
+    record_event(db, actor_user_id=str(actor_user_id), module="ucca", entity_type="AuditCycle",
+                 entity_id=str(cycle.id), action="create",
+                 new_values={"facility_id": str(facility_id), "period_label": cycle.period_label})
     db.commit()
     db.refresh(cycle)
-    return cycle
+    return _cycle_out(cycle, facility_name, 0, None)
 
 
 def get_cycle_or_404(db: Session, cycle_id: uuid.UUID) -> AuditCycle:
@@ -64,10 +73,25 @@ def get_cycle_or_404(db: Session, cycle_id: uuid.UUID) -> AuditCycle:
     return cycle
 
 
-def list_cycles(db: Session) -> list[AuditCycle]:
-    return list(
-        db.scalars(select(AuditCycle).order_by(AuditCycle.created_at.desc())).all()
+def list_cycles(db: Session) -> list[dict]:
+    """Un execute(): (ciclo, nombre centro, nº auditorías no borrador, score medio no borrador)."""
+    counted = (
+        select(
+            ChartAudit.cycle_id.label("cycle_id"),
+            func.count(ChartAudit.id).label("audits_count"),
+            func.avg(ChartAudit.score).label("average_score"),
+        )
+        .where(ChartAudit.status != "draft")
+        .group_by(ChartAudit.cycle_id)
+        .subquery()
     )
+    rows = db.execute(
+        select(AuditCycle, Facility.name, counted.c.audits_count, counted.c.average_score)
+        .join(Facility, Facility.id == AuditCycle.facility_id, isouter=True)
+        .join(counted, counted.c.cycle_id == AuditCycle.id, isouter=True)
+        .order_by(AuditCycle.year.desc(), AuditCycle.quarter.desc(), AuditCycle.created_at.desc())
+    ).all()
+    return [_cycle_out(cycle, name, count, avg) for cycle, name, count, avg in rows]
 
 
 def _current_template_version(db: Session) -> AuditTemplateVersion | None:

@@ -19,7 +19,7 @@ def list_cycles(
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(require_permission("ucca.view")),
 ) -> list[schemas.AuditCycleOut]:
-    return service.list_cycles(db)
+    return [schemas.AuditCycleOut.model_validate(row) for row in service.list_cycles(db)]
 
 
 @router.get("/criteria", response_model=list[schemas.AuditCriterionOut])
@@ -64,12 +64,11 @@ def create_cycle(
     current_user: CurrentUser = Depends(require_permission("ucca.create")),
 ) -> schemas.AuditCycleOut:
     require_facility_access(str(payload.facility_id), current_user)
-    return service.create_cycle(
-        db,
-        actor_user_id=uuid.UUID(current_user.id),
-        facility_id=payload.facility_id,
-        template_version_id=payload.template_version_id,
-        period_label=payload.period_label,
+    return domain_errors(
+        lambda: service.create_cycle(
+            db, actor_user_id=uuid.UUID(current_user.id), facility_id=payload.facility_id,
+            year=payload.year, quarter=payload.quarter,
+        )
     )
 
 
