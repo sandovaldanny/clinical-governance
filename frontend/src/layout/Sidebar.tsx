@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -54,22 +54,38 @@ function Chevron({ open }: { open: boolean }) {
   );
 }
 
+function persist(next: Record<string, boolean>) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    /* sin persistencia */
+  }
+}
+
 /** Barra lateral: tres bloques (Administración, Gobierno clínico, Dashboard) plegables. Cada título
- * abre/cierra sus accesos; el bloque de la ruta activa se abre solo y queda abierto aunque se pliegue
- * otro. La preferencia se recuerda en el navegador. */
+ * abre/cierra sus accesos, incluido el bloque activo. Al navegar a una ruta cuyo bloque está cerrado,
+ * ese bloque se abre. La preferencia se recuerda en el navegador. */
 export function Sidebar() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const [open, setOpen] = useState<Record<string, boolean>>(() => initialOpen(pathname));
 
+  // Al cambiar de ruta, abrir el bloque que la contiene (sin cerrar los demás).
+  useEffect(() => {
+    const owner = NAV_GROUPS.find((g) => groupContains(g, pathname));
+    if (!owner) return;
+    setOpen((prev) => {
+      if (prev[owner.titleKey]) return prev;
+      const next = { ...prev, [owner.titleKey]: true };
+      persist(next);
+      return next;
+    });
+  }, [pathname]);
+
   const toggle = (key: string) => {
     setOpen((prev) => {
       const next = { ...prev, [key]: !prev[key] };
-      try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        /* sin persistencia */
-      }
+      persist(next);
       return next;
     });
   };
@@ -87,7 +103,7 @@ export function Sidebar() {
     >
       {NAV_GROUPS.map((group) => {
         const active = groupContains(group, pathname);
-        const isOpen = open[group.titleKey] || active;
+        const isOpen = Boolean(open[group.titleKey]);
         const panelId = `nav-${group.titleKey.replace(/\W/g, "-")}`;
         return (
           <div key={group.titleKey} style={{ marginBottom: 20 }}>
