@@ -14,12 +14,12 @@ const TONES: Record<Tone, { bg: string; fg: string }> = {
 function toneFor(code: string): Tone {
   if (code === "compliant" || code === "approved" || code === "closed") return "success";
   if (code === "non_compliant" || code === "critical") return "danger";
-  if (code === "major" || code === "submitted") return "warning";
+  if (code === "major" || code === "submitted" || code === "in_progress") return "warning";
   return "neutral";
 }
 
 /** Chip traducido para estados/resultados/severidades. `ns` indica la rama i18n. */
-export function StatusBadge({ code, ns }: { code: string; ns: "ucca.statuses" | "ucca.outcomes" | "indicators.severities" }) {
+export function StatusBadge({ code, ns }: { code: string; ns: "ucca.statuses" | "ucca.outcomes" | "ucca.answers" | "ucca.actionStatuses" | "indicators.severities" }) {
   const { t } = useTranslation();
   const tone = TONES[toneFor(code)];
   return (

@@ -20,8 +20,15 @@ const linkStyle = ({ isActive }: { isActive: boolean }) => ({
   transition: "background .15s",
 });
 
+/** `/ucca` cubre ciclos y auditorías (`/ucca/cycles/…`, `/ucca/audits/…`) pero no `/ucca/dashboard`,
+ * que pertenece al bloque Dashboard. */
+function itemMatches(path: string, pathname: string) {
+  if (path === "/ucca") return pathname === "/ucca" || (pathname.startsWith("/ucca/") && !pathname.startsWith("/ucca/dashboard"));
+  return pathname === path || pathname.startsWith(`${path}/`);
+}
+
 function groupContains(group: NavGroup, pathname: string) {
-  return group.items.some((item) => (item.path === "/ucca" ? pathname === "/ucca" || pathname.startsWith("/ucca/") : pathname.startsWith(item.path)));
+  return group.items.some((item) => itemMatches(item.path, pathname));
 }
 
 /** Estado inicial: lo guardado por el usuario; si no hay nada, solo el bloque de la ruta actual abierto. */
@@ -138,7 +145,7 @@ export function Sidebar() {
             {isOpen && (
               <nav id={panelId} style={{ display: "flex", flexDirection: "column", gap: 4, marginTop: 4 }}>
                 {group.items.map((item) => (
-                  <NavLink key={item.path} to={item.path} style={linkStyle} end={item.path === "/ucca"}>
+                  <NavLink key={item.path} to={item.path} style={() => linkStyle({ isActive: itemMatches(item.path, pathname) })}>
                     {t(item.labelKey)}
                   </NavLink>
                 ))}

@@ -33,6 +33,6 @@ export const NAV_GROUPS: NavGroup[] = [
   },
   {
     titleKey: "nav.dashboard",
-    items: [{ labelKey: "nav.dashboardOverview", path: "/dashboard" }],
+    items: [{ labelKey: "nav.uccaDashboard", path: "/ucca/dashboard" }],
   },
 ];
