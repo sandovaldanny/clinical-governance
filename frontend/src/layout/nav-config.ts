@@ -27,6 +27,7 @@ export const NAV_GROUPS: NavGroup[] = [
     titleKey: "nav.governance",
     items: [
       { labelKey: "nav.uccaCycles", path: "/ucca" },
+      { labelKey: "nav.aegis", path: "/aegis" },
       { labelKey: "nav.indicators", path: "/indicators" },
     ],
   },

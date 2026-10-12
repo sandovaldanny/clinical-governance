@@ -39,7 +39,7 @@
   "nav": {
     "governance": "Gobierno clínico",
     "admin": "Administración (M01–M02)",
-    "uccaCycles": "UCCA — Ciclos",
+    "uccaCycles": "UCCA",
     "indicators": "Indicadores a evaluar",
     "users": "Usuarios",
     "facilities": "Centros médicos",
@@ -47,7 +47,8 @@
     "specialties": "Especialidades",
     "criteria": "Criterios de evaluación",
     "roles": "Roles AEGIS",
-    "positions": "Cargos"
+    "positions": "Cargos",
+    "aegis": "AEGIS"
   },
   "login": {
     "welcome": "Bienvenido",
@@ -249,5 +250,9 @@
       "name": "Cargo",
       "description": "Descripción"
     }
+  },
+  "aegis": {
+    "title": "AEGIS",
+    "subtitle": "Módulo en construcción. Pronto disponible."
   }
 }
