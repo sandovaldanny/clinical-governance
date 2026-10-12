@@ -44,3 +44,10 @@ def test_outcome_bands(score, expected):
 def test_unknown_answer_rejected():
     with pytest.raises(ValueError):
         compute_score([C, "maybe"])
+
+
+def test_criterion_sort_key_follows_excel_order():
+    from app.domains.governance.ucca.scoring import CRITERIA_ORDER, criterion_sort_key
+
+    assert CRITERIA_ORDER == ("CCA", "CRS", "CTP", "COM", "CDC", "CEP", "CMC")
+    assert sorted(["CMC", "CDC", "CCA", "ZZZ", "CRS"], key=criterion_sort_key) == ["CCA", "CRS", "CDC", "CMC", "ZZZ"]

@@ -142,3 +142,27 @@ def approve_chart_audit(
     audit = domain_errors(lambda: service.get_chart_audit_or_404(db, audit_id))
     require_facility_access(str(audit.facility_id), current_user)
     return domain_errors(lambda: service.approve_chart_audit(db, actor_user_id=uuid.UUID(current_user.id), audit=audit))
+
+
+@router.get("/cycles/{cycle_id}/summary", response_model=schemas.SummaryOut)
+def cycle_summary(
+    cycle_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("ucca.view")),
+) -> schemas.SummaryOut:
+    cycle = service.get_cycle_or_404(db, cycle_id)
+    require_facility_access(str(cycle.facility_id), current_user)
+    return schemas.SummaryOut.model_validate(service.cycle_summary(db, cycle))
+
+
+@router.get("/dashboard", response_model=schemas.SummaryOut)
+def dashboard(
+    facility_id: uuid.UUID | None = Query(default=None),
+    year: int | None = Query(default=None),
+    quarter: str | None = Query(default=None, pattern="^Q[1-4]$"),
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("ucca.view")),
+) -> schemas.SummaryOut:
+    if facility_id is not None:
+        require_facility_access(str(facility_id), current_user)
+    return schemas.SummaryOut.model_validate(service.dashboard(db, facility_id=facility_id, year=year, quarter=quarter))

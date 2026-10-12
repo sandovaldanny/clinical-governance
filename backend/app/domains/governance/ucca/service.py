@@ -26,7 +26,8 @@ from app.domains.governance.ucca.models import (
     Finding,
 )
 from app.domains.governance.ucca.schemas import ChartAuditWriteRequest
-from app.domains.governance.ucca.scoring import ANSWER_NA, ANSWER_NO, compute_score
+from app.domains.governance.ucca.scoring import ANSWER_NA, ANSWER_NO, compute_score, criterion_sort_key
+from app.domains.governance.ucca.summary import AnswerRow, AuditRow, OpenActionRow, summarize
 from app.domains.identity.models import Facility, Profession, Professional, User
 
 
@@ -107,7 +108,8 @@ def list_criteria(db: Session, *, only_active: bool = False) -> list[AuditCriter
     stmt = select(AuditCriterion).where(AuditCriterion.template_version_id == current_version.id)
     if only_active:
         stmt = stmt.where(AuditCriterion.is_active.is_(True))
-    return list(db.scalars(stmt.order_by(AuditCriterion.code)).all())
+    rows = list(db.scalars(stmt.order_by(AuditCriterion.code)).all())
+    return sorted(rows, key=lambda c: criterion_sort_key(c.code))
 
 
 def create_criterion(
@@ -168,13 +170,13 @@ def get_chart_audit_or_404(db: Session, audit_id: uuid.UUID) -> ChartAudit:
 
 
 def _active_criteria(db: Session, template_version_id: uuid.UUID) -> list[AuditCriterion]:
-    return list(
-        db.scalars(
-            select(AuditCriterion)
-            .where(AuditCriterion.template_version_id == template_version_id, AuditCriterion.is_active.is_(True))
-            .order_by(AuditCriterion.code)
-        ).all()
-    )
+    """Criterios activos de la versión, en el orden de columnas del Excel (CRITERIA_ORDER)."""
+    rows = db.scalars(
+        select(AuditCriterion)
+        .where(AuditCriterion.template_version_id == template_version_id, AuditCriterion.is_active.is_(True))
+        .order_by(AuditCriterion.code)
+    ).all()
+    return sorted(rows, key=lambda c: criterion_sort_key(c.code))
 
 
 def _validate_answers(criteria: list[AuditCriterion], payload: ChartAuditWriteRequest) -> dict[uuid.UUID, AuditCriterion]:
@@ -413,7 +415,7 @@ def _detail_from_parts(audit: ChartAudit, professional: Professional, profession
     answers = [
         {"criterion_id": a.criterion_id, "criterion_code": by_id[a.criterion_id].code, "outcome": a.outcome,
          "not_applicable_reason": a.not_applicable_reason, "comment": a.comment}
-        for a in sorted(payload.answers, key=lambda a: by_id[a.criterion_id].code)
+        for a in sorted(payload.answers, key=lambda a: criterion_sort_key(by_id[a.criterion_id].code))
     ]
     finding = None
     if payload.finding is not None:
@@ -451,7 +453,7 @@ def chart_audit_detail(db: Session, audit: ChartAudit) -> dict:
     answers = sorted(
         [{"criterion_id": r.criterion_id, "criterion_code": codes.get(r.criterion_id, "?"), "outcome": r.outcome,
           "not_applicable_reason": r.not_applicable_reason, "comment": r.comment} for r in rows],
-        key=lambda a: a["criterion_code"],
+        key=lambda a: criterion_sort_key(a["criterion_code"]),
     )
     finding = db.scalar(select(Finding).where(Finding.chart_audit_id == audit.id))
     return {
@@ -500,3 +502,82 @@ def list_chart_audits(db: Session, *, cycle_id: uuid.UUID) -> list[dict]:
             "answers": answers.get(audit.id, {}), "has_finding": audit.id in with_finding,
         })
     return out
+
+
+# ---------------------------------------------------------------------------
+# Agregados: summary por ciclo y dashboard
+# ---------------------------------------------------------------------------
+
+
+def _load_summary_rows(db: Session, *, cycle_ids: list[uuid.UUID] | None, facility_id, year, quarter) -> dict:
+    """Tres execute(): auditorías · respuestas · acciones abiertas. Filtros opcionales por ciclo/centro/periodo."""
+    audit_stmt = (
+        select(ChartAudit, Professional.employee_number, Professional.full_name, Profession.name, AuditCycle.year, AuditCycle.quarter)
+        .join(Professional, Professional.id == ChartAudit.professional_id)
+        .join(Profession, Profession.id == Professional.profession_id, isouter=True)
+        .join(AuditCycle, AuditCycle.id == ChartAudit.cycle_id)
+    )
+    if cycle_ids is not None:
+        audit_stmt = audit_stmt.where(ChartAudit.cycle_id.in_(cycle_ids))
+    if facility_id is not None:
+        audit_stmt = audit_stmt.where(ChartAudit.facility_id == facility_id)
+    if year is not None:
+        audit_stmt = audit_stmt.where(AuditCycle.year == year)
+    if quarter is not None:
+        audit_stmt = audit_stmt.where(AuditCycle.quarter == quarter)
+    audit_rows = db.execute(audit_stmt).all()
+    audits = [
+        AuditRow(id=a.id, professional_id=a.professional_id, employee_number=emp, professional_name=name,
+                 profession_name=prof, status=a.status, score=None if a.score is None else float(a.score),
+                 outcome=a.outcome, year=y, quarter=q)
+        for a, emp, name, prof, y, q in audit_rows
+    ]
+    ids = [a.id for a in audits]
+    answers = []
+    if ids:
+        answers = [
+            AnswerRow(audit_id=aid, code=code, outcome=outcome)
+            for aid, code, outcome in db.execute(
+                select(AuditResult.chart_audit_id, AuditCriterion.code, AuditResult.outcome)
+                .join(AuditCriterion, AuditCriterion.id == AuditResult.criterion_id)
+                .where(AuditResult.chart_audit_id.in_(ids))
+            ).all()
+        ]
+    open_actions = []
+    if ids:
+        open_actions = [
+            OpenActionRow(id=ca.id, audit_id=audit_id, case_reference=case_ref, professional_name=pro_name,
+                          finding=finding_text, responsible_name=resp, due_date=ca.due_date, status=ca.status)
+            for ca, audit_id, case_ref, pro_name, finding_text, resp in db.execute(
+                select(CorrectiveAction, Finding.chart_audit_id, ChartAudit.case_reference, Professional.full_name,
+                       Finding.description, User.full_name)
+                .join(Finding, Finding.id == CorrectiveAction.source_finding_id)
+                .join(ChartAudit, ChartAudit.id == Finding.chart_audit_id)
+                .join(Professional, Professional.id == ChartAudit.professional_id)
+                .join(User, User.id == CorrectiveAction.responsible_user_id, isouter=True)
+                .where(Finding.chart_audit_id.in_(ids), CorrectiveAction.status != "closed")
+                .order_by(CorrectiveAction.due_date)
+            ).all()
+        ]
+    return {"audits": audits, "answers": answers, "open_actions": open_actions}
+
+
+def _criteria_codes(db: Session, template_version_id: uuid.UUID | None) -> list[str]:
+    if template_version_id is None:
+        version = _current_template_version(db)
+        template_version_id = version.id if version else None
+    if template_version_id is None:
+        return []
+    return [c.code for c in _active_criteria(db, template_version_id)]
+
+
+def cycle_summary(db: Session, cycle: AuditCycle) -> dict:
+    codes = _criteria_codes(db, cycle.template_version_id)
+    rows = _load_summary_rows(db, cycle_ids=[cycle.id], facility_id=None, year=None, quarter=None)
+    return summarize(rows["audits"], rows["answers"], codes, rows["open_actions"])
+
+
+def dashboard(db: Session, *, facility_id: uuid.UUID | None, year: int | None, quarter: str | None) -> dict:
+    codes = _criteria_codes(db, None)
+    rows = _load_summary_rows(db, cycle_ids=None, facility_id=facility_id, year=year, quarter=quarter)
+    return summarize(rows["audits"], rows["answers"], codes, rows["open_actions"])

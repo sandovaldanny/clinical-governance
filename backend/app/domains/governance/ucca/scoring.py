@@ -51,3 +51,15 @@ def compute_score(outcomes: Iterable[str]) -> ScoreResult:
     yes = sum(1 for a in answers if a == ANSWER_YES)
     score = None if applicable == 0 else round(yes / applicable * 100, 2)
     return ScoreResult(applicable_count=applicable, yes_count=yes, score=score, outcome=outcome_for(score))
+
+
+# Orden de presentación de los criterios (columnas del Excel UCCA). Los códigos desconocidos
+# van después, en orden alfabético.
+CRITERIA_ORDER: tuple[str, ...] = ("CCA", "CRS", "CTP", "COM", "CDC", "CEP", "CMC")
+
+
+def criterion_sort_key(code: str) -> tuple[int, str]:
+    try:
+        return (CRITERIA_ORDER.index(code), code)
+    except ValueError:
+        return (len(CRITERIA_ORDER), code)

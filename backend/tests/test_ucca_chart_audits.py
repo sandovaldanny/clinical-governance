@@ -86,7 +86,7 @@ def test_create_all_yes_is_compliant(monkeypatch):
     body = r.json()
     assert (body["applicable_count"], body["yes_count"], body["score"], body["outcome"]) == (7, 7, 100.0, "compliant")
     assert body["status"] == "draft" and body["employee_number"] == "CL-0029"
-    assert {a["criterion_code"] for a in body["answers"]} == set(CODES)
+    assert [a["criterion_code"] for a in body["answers"]] == CODES  # orden del Excel, no alfabético
     from app.domains.governance.ucca.models import AuditResult, ChartAudit
 
     assert sum(isinstance(o, ChartAudit) for o in session.added) == 1

@@ -155,3 +155,50 @@ class AuditCriterionUpdateRequest(BaseModel):
     profession_interpretation: str | None = Field(default=None, max_length=1000)
     examples_evidence: str | None = Field(default=None, max_length=1000)
     is_active: bool | None = None
+
+
+class CriterionStatOut(BaseModel):
+    code: str
+    applicable: int
+    yes: int
+    yes_rate: float | None = None
+
+
+class ProfessionalStatOut(BaseModel):
+    professional_id: uuid.UUID
+    employee_number: str
+    professional_name: str
+    profession_name: str | None = None
+    audits_count: int
+    average_score: float | None = None
+    outcome: str | None = None
+    criteria: dict[str, float | None]
+
+
+class TrendPointOut(BaseModel):
+    year: int
+    quarter: str
+    audits_count: int
+    average_score: float | None = None
+
+
+class OpenActionOut(BaseModel):
+    id: uuid.UUID
+    audit_id: uuid.UUID
+    case_reference: str
+    professional_name: str
+    finding: str
+    responsible_name: str | None = None
+    due_date: date
+    status: str
+
+
+class SummaryOut(BaseModel):
+    audits_count: int
+    draft_count: int
+    average_score: float | None = None
+    outcome_distribution: dict[str, int]
+    criteria: list[CriterionStatOut]
+    professionals: list[ProfessionalStatOut]
+    trend: list[TrendPointOut]
+    open_corrective_actions: list[OpenActionOut]
