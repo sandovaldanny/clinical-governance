@@ -57,18 +57,6 @@ def update_criterion(
     )
 
 
-@router.get("/results", response_model=list[schemas.AuditResultDetailOut])
-def list_results(
-    cycle_id: uuid.UUID = Query(...),
-    db: Session = Depends(get_db),
-    current_user: CurrentUser = Depends(require_permission("ucca.view")),
-) -> list[schemas.AuditResultDetailOut]:
-    cycle = service.get_cycle_or_404(db, cycle_id)
-    require_facility_access(str(cycle.facility_id), current_user)
-    rows = service.list_results(db, cycle_id=cycle_id)
-    return [schemas.AuditResultDetailOut.model_validate(row) for row in rows]
-
-
 @router.post("/cycles", response_model=schemas.AuditCycleOut, status_code=201)
 def create_cycle(
     payload: schemas.AuditCycleCreateRequest,
@@ -85,32 +73,73 @@ def create_cycle(
     )
 
 
-@router.post("/results", response_model=schemas.AuditResultOut, status_code=201)
-def record_result(
-    payload: schemas.AuditResultCreateRequest,
+@router.get("/cycles/{cycle_id}/audits", response_model=list[schemas.ChartAuditRowOut])
+def list_chart_audits(
+    cycle_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("ucca.view")),
+) -> list[schemas.ChartAuditRowOut]:
+    cycle = service.get_cycle_or_404(db, cycle_id)
+    require_facility_access(str(cycle.facility_id), current_user)
+    return [schemas.ChartAuditRowOut.model_validate(r) for r in service.list_chart_audits(db, cycle_id=cycle_id)]
+
+
+@router.post("/cycles/{cycle_id}/audits", response_model=schemas.ChartAuditOut, status_code=status.HTTP_201_CREATED)
+def create_chart_audit(
+    cycle_id: uuid.UUID,
+    payload: schemas.ChartAuditWriteRequest,
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(require_permission("ucca.create")),
-) -> schemas.AuditResultOut:
-    cycle = service.get_cycle_or_404(db, payload.cycle_id)
+) -> schemas.ChartAuditOut:
+    cycle = service.get_cycle_or_404(db, cycle_id)
     require_facility_access(str(cycle.facility_id), current_user)
-    return service.record_result(
-        db,
-        actor_user_id=uuid.UUID(current_user.id),
-        cycle=cycle,
-        criterion_id=payload.criterion_id,
-        professional_id=payload.professional_id,
-        outcome=payload.outcome,
-        not_applicable_reason=payload.not_applicable_reason,
-        evidence_reference=payload.evidence_reference,
+    return domain_errors(
+        lambda: service.create_chart_audit(db, actor_user_id=uuid.UUID(current_user.id), cycle=cycle, payload=payload)
     )
 
 
-@router.post("/results/{result_id}/approve", response_model=schemas.AuditResultOut)
-def approve_result(
-    result_id: uuid.UUID,
+@router.get("/audits/{audit_id}", response_model=schemas.ChartAuditOut)
+def get_chart_audit(
+    audit_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("ucca.view")),
+) -> schemas.ChartAuditOut:
+    audit = domain_errors(lambda: service.get_chart_audit_or_404(db, audit_id))
+    require_facility_access(str(audit.facility_id), current_user)
+    return schemas.ChartAuditOut.model_validate(service.chart_audit_detail(db, audit))
+
+
+@router.patch("/audits/{audit_id}", response_model=schemas.ChartAuditOut)
+def update_chart_audit(
+    audit_id: uuid.UUID,
+    payload: schemas.ChartAuditWriteRequest,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("ucca.create")),
+) -> schemas.ChartAuditOut:
+    audit = domain_errors(lambda: service.get_chart_audit_or_404(db, audit_id))
+    require_facility_access(str(audit.facility_id), current_user)
+    return domain_errors(
+        lambda: service.update_chart_audit(db, actor_user_id=uuid.UUID(current_user.id), audit=audit, payload=payload)
+    )
+
+
+@router.post("/audits/{audit_id}/submit", response_model=schemas.ChartAuditOut)
+def submit_chart_audit(
+    audit_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: CurrentUser = Depends(require_permission("ucca.create")),
+) -> schemas.ChartAuditOut:
+    audit = domain_errors(lambda: service.get_chart_audit_or_404(db, audit_id))
+    require_facility_access(str(audit.facility_id), current_user)
+    return domain_errors(lambda: service.submit_chart_audit(db, actor_user_id=uuid.UUID(current_user.id), audit=audit))
+
+
+@router.post("/audits/{audit_id}/approve", response_model=schemas.ChartAuditOut)
+def approve_chart_audit(
+    audit_id: uuid.UUID,
     db: Session = Depends(get_db),
     current_user: CurrentUser = Depends(require_permission("ucca.approve")),
-) -> schemas.AuditResultOut:
-    result = service.get_result_or_404(db, result_id)
-    require_facility_access(str(result.facility_id), current_user)
-    return service.approve_result(db, actor_user_id=uuid.UUID(current_user.id), result=result)
+) -> schemas.ChartAuditOut:
+    audit = domain_errors(lambda: service.get_chart_audit_or_404(db, audit_id))
+    require_facility_access(str(audit.facility_id), current_user)
+    return domain_errors(lambda: service.approve_chart_audit(db, actor_user_id=uuid.UUID(current_user.id), audit=audit))

@@ -43,7 +43,13 @@ class FakeSession:
         return Scalars(self._scalars.pop(0) if self._scalars else [])
 
     def execute(self, stmt, params=None):
+        """Las sentencias `text()` (SET LOCAL de RLS, INSERT del audit ledger) no consumen
+        `execute_rows`; solo las consultas `select(...)` del servicio."""
+        from sqlalchemy.sql.elements import TextClause
+
         self.executed.append((stmt, params))
+        if isinstance(stmt, TextClause):
+            return Rows([])
         return Rows(self._execute_rows.pop(0) if self._execute_rows else [])
 
     def add(self, obj):

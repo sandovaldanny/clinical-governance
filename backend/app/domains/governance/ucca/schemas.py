@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -20,41 +22,103 @@ class AuditCycleOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class AuditResultCreateRequest(BaseModel):
-    cycle_id: uuid.UUID
+AnswerValue = Literal["compliant", "non_compliant", "not_applicable"]
+ActionStatus = Literal["assigned", "in_progress", "closed"]
+
+
+class AnswerIn(BaseModel):
     criterion_id: uuid.UUID
+    outcome: AnswerValue
+    not_applicable_reason: str | None = Field(default=None, max_length=500)
+    comment: str | None = Field(default=None, max_length=500)
+
+
+class CorrectiveActionIn(BaseModel):
+    description: str = Field(min_length=1, max_length=1000)
+    responsible_user_id: uuid.UUID
+    due_date: date
+    status: ActionStatus = "assigned"
+    closure_evidence: str | None = Field(default=None, max_length=1000)
+
+
+class FindingIn(BaseModel):
+    description: str = Field(min_length=1, max_length=1000)
+    corrective_action: CorrectiveActionIn | None = None
+
+
+class ChartAuditWriteRequest(BaseModel):
     professional_id: uuid.UUID
-    outcome: str  # compliant | non_compliant | not_applicable
-    not_applicable_reason: str | None = None
-    evidence_reference: str | None = None
+    case_reference: str = Field(min_length=1, max_length=80)
+    audit_date: date
+    notes: str = Field(default="", max_length=1000)
+    answers: list[AnswerIn]
+    finding: FindingIn | None = None
 
 
-class AuditResultOut(BaseModel):
-    id: uuid.UUID
-    cycle_id: uuid.UUID
+class AnswerOut(BaseModel):
     criterion_id: uuid.UUID
-    professional_id: uuid.UUID
-    outcome: str
-    status: str
-    evidence_reference: str | None = None
-    not_applicable_reason: str | None = None
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class AuditResultDetailOut(BaseModel):
-    id: uuid.UUID
     criterion_code: str
-    criterion_domain: str
-    professional_name: str
     outcome: str
-    status: str
-    evidence_reference: str | None = None
     not_applicable_reason: str | None = None
+    comment: str | None = None
 
 
-class AuditResultApproveRequest(BaseModel):
-    result_id: uuid.UUID
+class CorrectiveActionOut(BaseModel):
+    id: uuid.UUID
+    description: str
+    responsible_user_id: uuid.UUID
+    responsible_name: str | None = None
+    due_date: date
+    status: str
+    closure_evidence: str | None = None
+
+
+class FindingOut(BaseModel):
+    id: uuid.UUID
+    description: str
+    status: str
+    corrective_action: CorrectiveActionOut | None = None
+
+
+class ChartAuditOut(BaseModel):
+    id: uuid.UUID
+    cycle_id: uuid.UUID
+    facility_id: uuid.UUID
+    professional_id: uuid.UUID
+    professional_name: str
+    employee_number: str
+    profession_name: str | None = None
+    auditor_user_id: uuid.UUID
+    auditor_name: str | None = None
+    case_reference: str
+    audit_date: date
+    status: str
+    applicable_count: int
+    yes_count: int
+    score: float | None = None
+    outcome: str | None = None
+    notes: str = ""
+    answers: list[AnswerOut]
+    finding: FindingOut | None = None
+
+
+class ChartAuditRowOut(BaseModel):
+    """Fila de la tabla tipo Excel: respuestas como {codigo: outcome}."""
+    id: uuid.UUID
+    professional_id: uuid.UUID
+    professional_name: str
+    employee_number: str
+    profession_name: str | None = None
+    auditor_name: str | None = None
+    case_reference: str
+    audit_date: date
+    status: str
+    applicable_count: int
+    yes_count: int
+    score: float | None = None
+    outcome: str | None = None
+    answers: dict[str, str]
+    has_finding: bool
 
 
 class AuditCriterionOut(BaseModel):
