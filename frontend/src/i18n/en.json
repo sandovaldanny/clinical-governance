@@ -181,9 +181,6 @@
       "submit": "Submit",
       "approve": "Approve",
       "saving": "Saving…",
-      "saved": "Audit saved as draft.",
-      "submitted": "Audit submitted.",
-      "approved": "Audit approved.",
       "readOnly": "Audit {{status}}: read only.",
       "approvedNotice": "Approved audit: immutable (immutability rule).",
       "saveError": "Could not save the audit.",
@@ -222,6 +219,18 @@
       "finding": "If the outcome is not Compliant and there is at least one No, the key finding is mandatory; a corrective action (owner and due date) is recommended.",
       "workflow": "Workflow: Draft → Submitted → Approved. An approved audit is immutable.",
       "dashboard": "The dashboard only counts submitted or approved audits; % per criterion = Yes ÷ (Yes + No)."
+    },
+    "notice": {
+      "saved": "Audit saved as draft",
+      "submitted": "Audit submitted for approval",
+      "approved": "Audit approved",
+      "summary": "Chart {{mrn}} · {{name}} ({{cg}}): {{yes}} of {{applicable}} applicable criteria met · Score {{score}} · Outcome",
+      "finding": "Finding recorded: “{{finding}}”.",
+      "action": "Corrective action: “{{description}}” · Owner: {{owner}} · Due: {{due}} · Status: {{status}}.",
+      "ownerAssigned": "assigned",
+      "nextSubmit": "Next step: review and press “Submit” to send it for approval. While it is a draft you can still edit it.",
+      "nextApprove": "Next step: a user with approval permission must press “Approve”. The audit can no longer be edited.",
+      "nextDone": "The audit is immutable and now counts in the cycle and the dashboard."
     }
   },
   "indicators": {

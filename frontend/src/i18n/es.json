@@ -181,9 +181,6 @@
       "submit": "Enviar",
       "approve": "Aprobar",
       "saving": "Guardando…",
-      "saved": "Auditoría guardada como borrador.",
-      "submitted": "Auditoría enviada.",
-      "approved": "Auditoría aprobada.",
       "readOnly": "Auditoría {{status}}: solo lectura.",
       "approvedNotice": "Auditoría aprobada: inmutable (regla de inmutabilidad del funcional).",
       "saveError": "No fue posible guardar la auditoría.",
@@ -222,6 +219,18 @@
       "finding": "Si el outcome no es Compliant y hay al menos un No, el hallazgo principal es obligatorio; la acción correctiva (responsable y fecha límite) es recomendable.",
       "workflow": "Flujo: Borrador → Enviado → Aprobado. Una auditoría aprobada es inmutable.",
       "dashboard": "El dashboard solo cuenta auditorías enviadas o aprobadas; el % por criterio = Yes ÷ (Yes + No)."
+    },
+    "notice": {
+      "saved": "Auditoría guardada como borrador",
+      "submitted": "Auditoría enviada para aprobación",
+      "approved": "Auditoría aprobada",
+      "summary": "Expediente {{mrn}} · {{name}} ({{cg}}): {{yes}} de {{applicable}} criterios aplicables cumplidos · Score {{score}} · Outcome",
+      "finding": "Hallazgo registrado: «{{finding}}».",
+      "action": "Acción correctiva: «{{description}}» · Responsable: {{owner}} · Vence: {{due}} · Estado: {{status}}.",
+      "ownerAssigned": "asignado",
+      "nextSubmit": "Siguiente paso: revise y pulse «Enviar» para pasarla a aprobación. Mientras sea borrador puede editarla.",
+      "nextApprove": "Siguiente paso: un usuario con permiso de aprobación debe pulsar «Aprobar». La auditoría ya no se puede editar.",
+      "nextDone": "La auditoría es inmutable y ya cuenta en el ciclo y en el dashboard."
     }
   },
   "indicators": {

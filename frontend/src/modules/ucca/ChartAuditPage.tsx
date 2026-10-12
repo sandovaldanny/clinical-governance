@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import { ApiError, apiPatchJson, apiPostJson } from "../../api/client";
@@ -13,6 +13,7 @@ import { brandTokens } from "../../theme/brand-tokens";
 import { CriterionCard, type AnswerState } from "./components/CriterionCard";
 import { EvaluationRules } from "./components/EvaluationRules";
 import { EMPTY_FINDING, FindingSection, type FindingState } from "./components/FindingSection";
+import { SaveNotice, type NoticeKind } from "./components/SaveNotice";
 import { ScoreBar } from "./components/ScoreBar";
 import { computeScore } from "./scoring";
 import type { ActionStatus, AnswerValue, ChartAudit, ChartAuditWrite, Criterion, Cycle, Professional } from "./types";
@@ -29,6 +30,7 @@ function today(): string {
 export function ChartAuditPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { session } = useAuth();
   const me = useCurrentUser();
   const { cycleId: cycleParam, auditId } = useParams<{ cycleId?: string; auditId?: string }>();
@@ -52,7 +54,9 @@ export function ChartAuditPage() {
   const [answers, setAnswers] = useState<Record<string, AnswerState>>({});
   const [finding, setFinding] = useState<FindingState>(EMPTY_FINDING);
   const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [notice, setNotice] = useState<{ kind: NoticeKind; audit: ChartAudit } | null>(
+    () => (location.state as { notice?: { kind: NoticeKind; audit: ChartAudit } } | null)?.notice ?? null,
+  );
   const [saving, setSaving] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
 
@@ -126,13 +130,14 @@ export function ChartAuditPage() {
     setShowErrors(true);
     const problem = validate();
     if (problem) { setError(problem); return; }
-    setSaving(true); setError(null); setMessage(null);
+    setSaving(true); setError(null); setNotice(null);
     try {
       const saved = isEdit
         ? await apiPatchJson<ChartAudit>(`/ucca/audits/${auditId}`, payload(), session?.token)
         : await apiPostJson<ChartAudit>(`/ucca/cycles/${cycleId}/audits`, payload(), session?.token);
-      setMessage(t("ucca.form.saved"));
-      if (!isEdit) navigate(`/ucca/audits/${saved.id}`, { replace: true });
+      // Tras crear se navega al detalle: el aviso viaja en el estado de la ruta para sobrevivir al cambio.
+      setNotice({ kind: "saved", audit: saved });
+      if (!isEdit) navigate(`/ucca/audits/${saved.id}`, { replace: true, state: { notice: { kind: "saved", audit: saved } } });
       else existing.reload();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("ucca.form.saveError"));
@@ -141,10 +146,10 @@ export function ChartAuditPage() {
 
   async function transition(kind: "submit" | "approve") {
     if (!auditId) return;
-    setSaving(true); setError(null); setMessage(null);
+    setSaving(true); setError(null); setNotice(null);
     try {
-      await apiPostJson<ChartAudit>(`/ucca/audits/${auditId}/${kind}`, {}, session?.token);
-      setMessage(t(kind === "submit" ? "ucca.form.submitted" : "ucca.form.approved"));
+      const updated = await apiPostJson<ChartAudit>(`/ucca/audits/${auditId}/${kind}`, {}, session?.token);
+      setNotice({ kind: kind === "submit" ? "submitted" : "approved", audit: updated });
       existing.reload();
     } catch (err) {
       setError(err instanceof ApiError ? err.message : t("ucca.form.saveError"));
@@ -211,7 +216,7 @@ export function ChartAuditPage() {
         <FindingSection state={finding} onChange={setFinding} required={findingRequired} owners={owners.data} readOnly={readOnly} />
       </form>
 
-      {message && <p role="status" style={{ color: brandTokens.colors.success, marginTop: 12 }}>{message}</p>}
+      {notice && <SaveNotice kind={notice.kind} audit={notice.audit} onClose={() => setNotice(null)} ownerName={(id) => owners.data.find((o) => o.id === id)?.full_name} />}
       {error && <p role="alert" style={{ color: brandTokens.colors.danger, marginTop: 12 }}>{error}</p>}
 
       <ScoreBar score={live} answered={answered} total={criteria.data.length} actions={
