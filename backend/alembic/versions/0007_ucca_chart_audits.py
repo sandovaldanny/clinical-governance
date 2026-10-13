@@ -17,6 +17,10 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # Base nueva: 0004 ya creó ucca_chart_audits y las columnas de esta revisión.
+    if sa.inspect(op.get_bind()).has_table("ucca_chart_audits"):
+        return
+
     # Ciclo: año/trimestre con backfill desde period_label "Q3-2026"
     op.add_column("ucca_audit_cycles", sa.Column("year", sa.Integer(), nullable=True))
     op.add_column("ucca_audit_cycles", sa.Column("quarter", sa.String(2), nullable=True))

@@ -17,6 +17,10 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # Base nueva: 0004 ya creó la tabla con la estructura definitiva.
+    if "domain" in {c["name"] for c in sa.inspect(op.get_bind()).get_columns("ucca_audit_criteria")}:
+        return
+
     op.execute(
         """
         DELETE FROM ucca_audit_criteria c

@@ -17,6 +17,10 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # Base nueva: 0001 ya creó estas columnas desde los modelos actuales.
+    if "status" in {c["name"] for c in sa.inspect(op.get_bind()).get_columns("users")}:
+        return
+
     # users
     op.add_column("users", sa.Column("first_name", sa.String(120), nullable=True))
     op.add_column("users", sa.Column("last_name", sa.String(120), nullable=True))

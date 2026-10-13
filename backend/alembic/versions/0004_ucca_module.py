@@ -1,6 +1,10 @@
 """M04 — tablas de UCCA y M06 — stub de Acciones Correctivas, con RLS aplicada por facility_id
 siguiendo exactamente el patrón de 0003_rls_policies.py.
 
+Nota: `create_all` materializa los modelos ACTUALES (incluida `ucca_chart_audits`, añadida en 0007).
+En una base nueva las migraciones 0005–0007 detectan que el esquema ya está y no hacen nada; en bases
+creadas antes de ellas aplican sus cambios incrementales.
+
 Revision ID: 0004
 Revises: 0003
 Create Date: 2026-09-08
@@ -24,6 +28,7 @@ _TABLES = [
     "ucca_audit_results",
     "ucca_findings",
     "corrective_actions",
+    "ucca_chart_audits",
 ]
 
 _FACILITY_SCOPED_TABLES = [
@@ -31,6 +36,7 @@ _FACILITY_SCOPED_TABLES = [
     "ucca_audit_results",
     "ucca_findings",
     "corrective_actions",
+    "ucca_chart_audits",
 ]
 
 
