@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     env: str = "local"
     auth_disabled: bool = False
 
-    seed_admin_email: str = "admin@alkalma.local"
+    seed_admin_email: str = "admin@alkalma.health"
     # Demo: acceso `admin` / `admin` sin cambio forzado (decisión del equipo para el mockup público).
     seed_admin_temp_password: str = "admin"
 
