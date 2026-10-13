@@ -68,7 +68,7 @@ export function UccaCyclePage() {
           emptyMessage={t("ucca.table.empty")}
           columns={[
             { key: "cg", header: t("ucca.table.cgId"), width: 64, render: (r) => <code style={{ fontSize: 12, whiteSpace: "nowrap" }}>{r.employee_number}</code> },
-            { key: "pro", header: t("ucca.table.professional"), render: (r) => (
+            { key: "pro", header: t("ucca.table.professional"), width: 220, render: (r) => (
               <span style={{ display: "block", ...small }}>
                 <strong style={{ fontWeight: 500 }}>{r.professional_name}</strong>
                 <span style={{ display: "block", ...muted }}>{r.profession_name ?? "—"}</span>
@@ -95,8 +95,8 @@ export function UccaCyclePage() {
               <span style={small}>{r.yes_count}/{r.applicable_count}</span>
             ) },
             { key: "score", header: t("ucca.table.score"), width: 60, render: (r) => <strong style={{ ...small, fontWeight: 600, whiteSpace: "nowrap" }}>{formatScore(r.score)}</strong> },
-            { key: "outcome", header: t("ucca.table.outcome"), width: 132, render: (r) => (
-              <span style={{ display: "grid", gap: 4, justifyItems: "start" }}>
+            { key: "outcome", header: t("ucca.table.outcome"), render: (r) => (
+              <span style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
                 <OutcomeBadge outcome={r.outcome} />
                 <StatusBadge code={r.status} ns="ucca.statuses" />
               </span>
