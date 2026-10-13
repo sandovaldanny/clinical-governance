@@ -18,11 +18,12 @@ export class ApiError extends Error {
   }
 }
 
-export async function login(email: string, password: string): Promise<LoginResponse> {
+/** `identifier`: correo completo o solo su parte local (p. ej. `admin`). */
+export async function login(identifier: string, password: string): Promise<LoginResponse> {
   const response = await fetch(`${API_BASE}/identity/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ identifier, password }),
   });
   if (!response.ok) {
     throw new Error("Credenciales inválidas o cuenta no autorizada.");

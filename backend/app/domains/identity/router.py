@@ -18,7 +18,7 @@ router = APIRouter(prefix="/identity", tags=["identity"])
 
 @router.post("/auth/login", response_model=schemas.TokenResponse)
 def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)) -> schemas.TokenResponse:
-    user = service.authenticate(db, email=payload.email, password=payload.password)
+    user = service.authenticate(db, identifier=payload.identifier, password=payload.password)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Credenciales inválidas")
 

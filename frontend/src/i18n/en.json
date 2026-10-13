@@ -55,7 +55,8 @@
   "login": {
     "welcome": "Welcome",
     "subtitle": "Private access for the Alkalma Health clinical governance team.",
-    "email": "Corporate email",
+    "user": "Username",
+    "userPlaceholder": "username or corporate email",
     "password": "Password",
     "submit": "Sign in",
     "error": "Could not sign in. Please check your credentials."

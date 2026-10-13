@@ -8,7 +8,7 @@ from __future__ import annotations
 import secrets
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.audit import record_event
@@ -34,8 +34,15 @@ from app.domains.identity.models import (
 _apply_changes = apply_changes
 
 
-def authenticate(db: Session, *, email: str, password: str) -> User | None:
-    user = db.scalar(select(User).where(User.email == email, User.is_active.is_(True)))
+def authenticate(db: Session, *, identifier: str, password: str) -> User | None:
+    """`identifier` es el correo completo o solo su parte local (`admin` ≡ `admin@<dominio>`);
+    la parte local debe ser única entre usuarios activos para resolver."""
+    ident = identifier.strip().lower()
+    if "@" in ident:
+        condition = func.lower(User.email) == ident
+    else:
+        condition = func.split_part(func.lower(User.email), "@", 1) == ident
+    user = db.scalar(select(User).where(condition, User.is_active.is_(True)))
     if not user or not user.hashed_password:
         return None
     if not verify_password(password, user.hashed_password):

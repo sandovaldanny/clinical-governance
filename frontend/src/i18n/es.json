@@ -55,7 +55,8 @@
   "login": {
     "welcome": "Bienvenido",
     "subtitle": "Acceso privado para el equipo de gobierno clínico de Alkalma Health.",
-    "email": "Correo corporativo",
+    "user": "Usuario",
+    "userPlaceholder": "usuario o correo corporativo",
     "password": "Contraseña",
     "submit": "Ingresar",
     "error": "No fue posible iniciar sesión. Verifique sus credenciales."

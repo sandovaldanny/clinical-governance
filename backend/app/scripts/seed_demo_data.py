@@ -464,9 +464,13 @@ def _get_or_create_user(
     profession_id: uuid.UUID | None,
     position_id: uuid.UUID | None,
     must_change_password: bool = False,
+    reset_password: bool = False,
 ) -> User:
     row = db.scalar(select(User).where(User.email == email))
     if row:
+        if reset_password:
+            row.hashed_password = hash_password(password)
+            row.must_change_password = must_change_password
         return row
     row = User(
         email=email,
@@ -566,8 +570,8 @@ def _seed_users(db: Session, facilities: dict[str, Facility], settings) -> dict[
             if spec.get("use_settings_password")
             else DEMO_PASSWORD
         )
-        must_change = bool(spec.get("use_settings_password"))
-
+        # Demo: el admin entra con SEED_ADMIN_TEMP_PASSWORD sin cambio forzado y cada seed la
+        # restablece, para que el acceso de demostración sea predecible tras cada despliegue.
         user = _get_or_create_user(
             db,
             email=spec["email"],
@@ -576,7 +580,8 @@ def _seed_users(db: Session, facilities: dict[str, Facility], settings) -> dict[
             password=password,
             profession_id=profession_id,
             position_id=position_id,
-            must_change_password=must_change,
+            must_change_password=False,
+            reset_password=bool(spec.get("use_settings_password")),
         )
         users[spec["email"]] = user
 

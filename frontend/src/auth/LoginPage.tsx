@@ -7,13 +7,13 @@ import { brandTokens } from "../theme/brand-tokens";
 import { useAuth } from "./AuthContext";
 
 /**
- * Pantalla de acceso con branding Alkalma (sección 6.1 del funcional): sin acceso anónimo;
- * el backend indica must_change_password para forzar cambio en el primer acceso.
+ * Pantalla de acceso con branding Alkalma (sección 6.1 del funcional): sin acceso anónimo.
+ * El identificador es el correo o solo su parte local (`admin`).
  */
 export function LoginPage() {
   const { t } = useTranslation();
   const { setSession } = useAuth();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -23,7 +23,7 @@ export function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      const result = await login(email, password);
+      const result = await login(identifier, password);
       setSession({ token: result.access_token, mustChangePassword: result.must_change_password });
     } catch {
       setError(t("login.error"));
@@ -87,12 +87,15 @@ export function LoginPage() {
             {t("login.subtitle")}
           </p>
 
-          <label style={{ display: "block", fontSize: 13, fontWeight: 500, marginBottom: 6 }}>{t("login.email")}</label>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 500, marginBottom: 6 }}>{t("login.user")}</label>
           <input
-            type="email"
+            type="text"
             autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            autoCapitalize="none"
+            spellCheck={false}
+            placeholder={t("login.userPlaceholder")}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             required
             style={{ marginBottom: 18 }}
           />

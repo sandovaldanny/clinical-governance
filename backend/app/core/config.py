@@ -18,7 +18,8 @@ class Settings(BaseSettings):
     auth_disabled: bool = False
 
     seed_admin_email: str = "admin@alkalma.local"
-    seed_admin_temp_password: str = "ChangeMeOnFirstLogin!23"
+    # Demo: acceso `admin` / `admin` sin cambio forzado (decisión del equipo para el mockup público).
+    seed_admin_temp_password: str = "admin"
 
     @field_validator("database_url")
     @classmethod

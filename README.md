@@ -105,14 +105,16 @@ medicación), 7 usuarios demo, 3 profesionales, la plantilla UCCA v1 con los 7 c
 
 | Usuario | Rol | Alcance |
 |---|---|---|
-| `admin@alkalma.health` | System Administrator | corporativo (contraseña temporal de `SEED_ADMIN_TEMP_PASSWORD`, cambio forzado) |
+| `admin` (= `admin@alkalma.health`) | System Administrator | corporativo. Contraseña `admin` (`SEED_ADMIN_TEMP_PASSWORD`), sin cambio forzado; el seed la restablece en cada ejecución. |
 | `governance.lead@alkalma.health` | Governance Lead | corporativo |
 | `md.bateen@alkalma.health` / `md.falah@alkalma.health` | Medical Director | un centro cada uno |
 | `quality@alkalma.health` | Quality Manager | corporativo |
 | `auditor@alkalma.health` | Auditor | Al Bateen |
 | `clinician@alkalma.health` | Clinician | Al Bateen |
 
-Contraseña de los usuarios demo (excepto admin): la imprime el seed al terminar.
+Contraseña de los usuarios demo (excepto admin): la imprime el seed al terminar. En la pantalla de acceso
+el usuario puede escribirse completo (`auditor@alkalma.health`) o solo la parte antes de la `@` (`auditor`).
+La sesión se guarda en `sessionStorage`: sobrevive a recargar, se cierra con la pestaña.
 
 ### Modo local sin autenticación (solo desarrollo)
 
@@ -189,20 +191,21 @@ Variables de entorno del proyecto Vercel (Production):
 | `DATABASE_URL` | la inyecta la integración Neon |
 | `JWT_SECRET` | secreto largo y aleatorio (`openssl rand -hex 32`). Con `ENV != local` el backend **rechaza arrancar** con el valor por defecto. |
 | `ENV` | `production` |
-| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_TEMP_PASSWORD` | solo para el seed inicial |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_TEMP_PASSWORD` | opcionales; por defecto `admin@alkalma.health` / `admin` |
 
-Primera puesta en marcha (desde la máquina del desarrollador, con el `DATABASE_URL` de Neon en `backend/.env`):
+Primera puesta en marcha:
 
 ```bash
-vercel link && vercel integration add neon --name clinical-governance-db   # crea la DB y DATABASE_URL
-vercel env add JWT_SECRET production && vercel env add ENV production
-cd backend && ./.venv/bin/alembic upgrade head && ./.venv/bin/python -m app.scripts.seed_demo_data
-cd .. && vercel --prod
+vercel link && vercel integration add neon --name clinical-governance-db   # crea la DB e inyecta DATABASE_URL
+openssl rand -hex 32 | vercel env add JWT_SECRET production
+echo production | vercel env add ENV production
+vercel --prod
 ```
 
-Despliegues siguientes: `git push` a `master` (proyecto conectado al repositorio) o `vercel --prod`.
-`AUTH_DISABLED` / `VITE_AUTH_DISABLED` nunca se definen en Vercel: en producción se entra con el System
-Administrator del seed y se cambia la contraseña temporal en el primer login.
+El build (`vercel-build.sh`) compila la SPA y, con `DATABASE_URL_UNPOOLED`, ejecuta `alembic upgrade head` y el
+seed demo (idempotente). Así no hace falta acceso directo a Postgres desde la máquina del desarrollador.
+Despliegues siguientes: `vercel --prod` desde la raíz. `AUTH_DISABLED` / `VITE_AUTH_DISABLED` nunca se definen
+en Vercel (y `.env*` locales quedan fuera del upload): en producción se entra con `admin` / `admin`.
 
 Nota de seguridad local: `infra/postgres/init/01-app-role.sql`, `docker-compose.yml` y `.env.example` usan
 credenciales fijas (`aegis` / `aegis_app`) **solo para desarrollo**; no exponer ese Postgres fuera de localhost.

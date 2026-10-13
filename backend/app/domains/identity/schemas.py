@@ -14,7 +14,7 @@ FacilityStatus = Literal["active", "closed"]
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    identifier: str = Field(min_length=1, max_length=254)  # correo completo o su parte local (`admin`)
     password: str
 
 
