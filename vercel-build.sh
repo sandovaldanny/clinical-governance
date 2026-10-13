@@ -3,6 +3,8 @@
 # Las migraciones usan la URL sin pooler (DDL); el runtime usa DATABASE_URL (pooled).
 set -euo pipefail
 
+# Nunca heredar el bypass de login de un .env local: en Vercel el valor viene del entorno del proyecto.
+export VITE_AUTH_DISABLED="${VITE_AUTH_DISABLED:-false}"
 npm --prefix frontend run build
 
 # La imagen de build usa un Python gestionado por uv (PEP 668): instalamos en un venv propio.
