@@ -29,7 +29,7 @@ Incidentes, Quejas, CME, Inteligencia Ejecutiva) se agrega siguiendo el mismo pa
 │   │   ├── scripts/         #   seed del System Administrator inicial y seed de demostración
 │   │   ├── api.py           #   registro único de routers
 │   │   └── main.py
-│   ├── alembic/versions/    #   0001 esquema maestro · 0002 audit ledger · 0003 RLS · 0004 UCCA/M06
+│   ├── alembic/versions/    #   0001 esquema maestro · 0002 audit ledger · 0003 RLS · 0004 UCCA/M06 · 0005 admin · 0006 criterios · 0007 auditoría por expediente
 │   └── tests/               #   RBAC, motor de reglas, smoke HTTP (sin dependencia de Postgres)
 ├── frontend/                # React 18 + TypeScript + Vite
 │   └── src/
@@ -37,14 +37,18 @@ Incidentes, Quejas, CME, Inteligencia Ejecutiva) se agrega siguiendo el mismo pa
 │       ├── auth/            #   login + contexto de sesión (JWT en memoria)
 │       ├── api/             #   cliente fetch con proxy /api → backend
 │       ├── layout/          #   AppShell, Sidebar, nav-config por módulo
-│       ├── components/      #   DataTable, PageHeader
-│       ├── hooks/           #   useApiList
-│       └── modules/         #   admin (M01/M02: usuarios, centros, profesiones, especialidades, roles), indicators, ucca
+│       ├── components/      #   DataTable, Drawer, FormField, StatusBadge/Select/Toggle, Toolbar, ProfileMenu, LanguageToggle…
+│       ├── hooks/           #   useApiList, useApiGet, useCurrentUser, useCanManage
+│       ├── i18n/            #   es.json / en.json (react-i18next)
+│       └── modules/         #   admin (M01/M02), ucca (M04: ciclos, auditoría, dashboard), indicators (M05), aegis (placeholder)
+├── api/index.py             # entrada para Vercel: quita el prefijo /api y delega en backend/app (ver Despliegue)
 ├── infra/                   # infraestructura local: init SQL de Postgres (rol aegis_app restringido)
 ├── branding/                # identidad Alkalma: guía de tokens, logo placeholder, insumos pendientes
 ├── docs/                    # requerimiento funcional, arquitectura técnica, specs/planes de proceso
 ├── graphify-out/            # grafo de conocimiento del código (graphify) — regenerable
 ├── docker-compose.yml       # db :5432 · backend :8000 · frontend :5173
+├── vercel.json              # build de la SPA + función Python + rewrites (/api/* → backend, resto → index.html)
+├── requirements.txt         # dependencias runtime del backend para Vercel (sin uvicorn/pytest)
 └── .env.example             # variables para docker compose
 ```
 
@@ -122,6 +126,19 @@ VITE_AUTH_DISABLED=true
 Reinicie ambos procesos (Vite lee `.env` solo al arrancar). El backend actúa como el System Administrator
 del seed y la UI muestra una franja de advertencia. **Nunca** habilitar en staging o producción.
 
+## Navegación
+
+Barra lateral con tres grupos plegables (preferencia guardada en `localStorage`, clave `aegis.sidebar.open`):
+
+| Grupo | Pantallas |
+|---|---|
+| Administración | Usuarios · Cargos · Centros médicos · Profesiones · Especialidades · Criterios de evaluación · Roles AEGIS |
+| Gobierno clínico | UCCA (ciclos → ciclo → auditar expediente) · AEGIS (módulo en construcción) · Indicadores a evaluar (catálogos M05) |
+| Dashboard | UCCA (`/ucca/dashboard`) |
+
+Cabecera: selector ES/EN y menú de perfil del usuario autenticado. La franja ámbar superior solo aparece con
+`VITE_AUTH_DISABLED=true`.
+
 ## Módulo administrativo (M01/M02)
 
 Implementa el documento `docs/AEGIS_M01_User_Organization_Access.md`. Cada tabla admin permite
@@ -152,6 +169,43 @@ Diseño: `docs/superpowers/specs/2026-10-12-ucca-chart-audit-design.md` · Guía
 | Dashboard → UCCA | `GET /ucca/dashboard?facility_id&year&quarter` | Solo auditorías enviadas/aprobadas; % Yes por criterio, por profesional, tendencia por trimestre, acciones abiertas. |
 
 Permisos: `ucca.view` leer · `ucca.create` crear/editar borrador/enviar · `ucca.approve` aprobar.
+
+## Despliegue (GitHub + Vercel)
+
+Repositorio: <https://github.com/sandovaldanny/clinical-governance>. Un solo proyecto Vercel sirve ambas partes:
+
+- **SPA**: `vercel.json` construye `frontend/` (`npm ci && npm run build`) y publica `frontend/dist`; toda ruta
+  que no empiece por `/api/` cae en `index.html` (React Router).
+- **API**: `api/index.py` es una Python Serverless Function (3.12, `requirements.txt` raíz) que quita el prefijo
+  `/api` y delega en `backend/app/main.py`. Vercel la empaqueta con `backend/app/**`; migraciones y tests quedan
+  fuera (`.vercelignore`).
+- **Base de datos**: Postgres gestionado (Neon vía Vercel Marketplace). `Settings` acepta `postgres://` /
+  `postgresql://` y los normaliza a `postgresql+psycopg://`.
+
+Variables de entorno del proyecto Vercel (Production):
+
+| Variable | Valor |
+|---|---|
+| `DATABASE_URL` | la inyecta la integración Neon |
+| `JWT_SECRET` | secreto largo y aleatorio (`openssl rand -hex 32`). Con `ENV != local` el backend **rechaza arrancar** con el valor por defecto. |
+| `ENV` | `production` |
+| `SEED_ADMIN_EMAIL` / `SEED_ADMIN_TEMP_PASSWORD` | solo para el seed inicial |
+
+Primera puesta en marcha (desde la máquina del desarrollador, con el `DATABASE_URL` de Neon en `backend/.env`):
+
+```bash
+vercel link && vercel integration add neon --name clinical-governance-db   # crea la DB y DATABASE_URL
+vercel env add JWT_SECRET production && vercel env add ENV production
+cd backend && ./.venv/bin/alembic upgrade head && ./.venv/bin/python -m app.scripts.seed_demo_data
+cd .. && vercel --prod
+```
+
+Despliegues siguientes: `git push` a `master` (proyecto conectado al repositorio) o `vercel --prod`.
+`AUTH_DISABLED` / `VITE_AUTH_DISABLED` nunca se definen en Vercel: en producción se entra con el System
+Administrator del seed y se cambia la contraseña temporal en el primer login.
+
+Nota de seguridad local: `infra/postgres/init/01-app-role.sql`, `docker-compose.yml` y `.env.example` usan
+credenciales fijas (`aegis` / `aegis_app`) **solo para desarrollo**; no exponer ese Postgres fuera de localhost.
 
 ## Cómo se agrega un módulo nuevo
 
@@ -190,4 +244,5 @@ Permisos: `ucca.view` leer · `ucca.create` crear/editar borrador/enviar · `ucc
 - Frontend: React + TypeScript + Vite, sin librería de UI todavía; el branding definitivo se conecta
   reemplazando `brand-tokens.ts` y los assets de `branding/`.
 - Scheduler embebido (APScheduler) solo para el arquetipo; en producción, worker dedicado (Celery beat).
-- No incluye orquestación en nube (Azure Container Apps/AKS) ni CI/CD — pertenece al diseño de despliegue.
+- Despliegue de demostración en Vercel (SPA + función Python + Neon). La orquestación definitiva en Azure
+  (Container Apps/AKS) y el CI/CD pertenecen al diseño de despliegue.

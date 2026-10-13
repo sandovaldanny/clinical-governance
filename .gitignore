@@ -10,3 +10,6 @@ dist/
 *.tsbuildinfo
 graphify-out/cache/
 .playwright-mcp/
+.vercel
+.env.local
+.env*.local
