@@ -31,7 +31,7 @@
 - [ ] **Step 1: Create `apps/` directory**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 mkdir -p apps
 ```
 
@@ -82,7 +82,7 @@ git commit -m "chore: add root .gitignore and apps/ scaffolding"
 - [ ] **Step 1: Move tracked backend content, leaving build artifacts behind**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 rsync -a --exclude='.venv/' --exclude='__pycache__/' --exclude='.pytest_cache/' \
   aegis-scaffold/backend/ apps/backend/
 ```
@@ -105,7 +105,7 @@ python3 -m venv .venv
 - [ ] **Step 4: Verify the app imports cleanly from the new path**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance/apps/backend
+cd <repo>/apps/backend
 ./.venv/bin/python -c "from app.main import app; print('OK')"
 ```
 Expected: `OK` (no `ModuleNotFoundError`, no import-time exceptions)
@@ -113,7 +113,7 @@ Expected: `OK` (no `ModuleNotFoundError`, no import-time exceptions)
 - [ ] **Step 5: Stage and commit**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 git add apps/backend
 git commit -m "refactor: move backend into apps/backend"
 ```
@@ -133,7 +133,7 @@ git commit -m "refactor: move backend into apps/backend"
 - [ ] **Step 1: Move tracked frontend content, leaving build artifacts behind**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 rsync -a --exclude='node_modules/' --exclude='dist/' \
   aegis-scaffold/frontend/ apps/frontend/
 ```
@@ -155,7 +155,7 @@ npm install --silent
 - [ ] **Step 4: Verify the build succeeds from the new path**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance/apps/frontend
+cd <repo>/apps/frontend
 npm run build
 ```
 Expected: exits 0, produces `dist/`
@@ -163,7 +163,7 @@ Expected: exits 0, produces `dist/`
 - [ ] **Step 5: Stage and commit**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 git add apps/frontend
 git commit -m "refactor: move frontend into apps/frontend"
 ```
@@ -187,7 +187,7 @@ git commit -m "refactor: move frontend into apps/frontend"
 - [ ] **Step 1: Move docs and root files**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 mkdir -p docs
 rsync -a aegis-scaffold/docs/ docs/
 mv aegis-scaffold/README.md ./README.md
@@ -314,7 +314,7 @@ Expected: any matches use `apps/backend` / `apps/frontend` (fix any that don't �
 - [ ] **Step 8: Stage and commit**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 git add docs README.md docker-compose.yml .env.example
 git commit -m "refactor: move docs/README/docker-compose to root, fix apps/ paths"
 ```
@@ -338,7 +338,7 @@ Note: `.env` is gitignored by design (secrets) — it will show as untracked, no
 - [ ] **Step 1: Confirm `aegis-scaffold/` has nothing left except gitignored build artifacts**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 find aegis-scaffold -type f | grep -v -E '\.venv/|node_modules/|__pycache__/|\.pytest_cache/|/dist/'
 ```
 Expected: empty output (if anything else prints, STOP — it means a file wasn't moved in Tasks 2–4, go back and move it before deleting)
@@ -377,7 +377,7 @@ git commit -m "chore: remove duplicate docs/ and obsolete build artifacts"
 - [ ] **Step 1: Re-run graphify from the new root (paths inside the graph changed with the rename)**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 graphify update . --force
 ```
 Expected: completes, reports updated node/edge counts reflecting `apps/backend`/`apps/frontend` paths
@@ -393,7 +393,7 @@ Expected: `backend import OK`
 - [ ] **Step 3: Final frontend smoke check**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance/apps/frontend
+cd <repo>/apps/frontend
 test -d dist && echo "frontend build OK"
 ```
 Expected: `frontend build OK` (from Task 3's build; rerun `npm run build` if `dist/` is missing)
@@ -401,7 +401,7 @@ Expected: `frontend build OK` (from Task 3's build; rerun `npm run build` if `di
 - [ ] **Step 4: Commit the refreshed graph**
 
 ```bash
-cd /Users/danielsandoval/Documents/Proyectos/clinical-governance
+cd <repo>
 git add graphify-out
 git commit -m "chore: rebuild graphify graph after apps/ reorg"
 ```

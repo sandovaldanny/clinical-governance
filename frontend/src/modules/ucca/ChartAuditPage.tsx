@@ -60,6 +60,14 @@ export function ChartAuditPage() {
   const [saving, setSaving] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
 
+  // El aviso viaja en el history state al crear; se consume una vez para que reload/Back no lo repitan.
+  useEffect(() => {
+    if ((location.state as { notice?: unknown } | null)?.notice) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Carga de una auditoría existente → estado del formulario.
   useEffect(() => {
     const a = existing.data;

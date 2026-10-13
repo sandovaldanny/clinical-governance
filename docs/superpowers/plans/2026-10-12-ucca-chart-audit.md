@@ -166,8 +166,8 @@ Expected: `11 passed`
 - [ ] **Step 5: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add backend/app/domains/governance/ucca/scoring.py backend/tests/test_ucca_scoring.py
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca): pure score/outcome calculation for chart audits
+git -C <repo> add backend/app/domains/governance/ucca/scoring.py backend/tests/test_ucca_scoring.py
+git -C <repo> commit -m "feat(ucca): pure score/outcome calculation for chart audits
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -459,8 +459,8 @@ Expected: `Q3-2026|2026|Q3` y la tabla nueva listada con sus columnas.
 - [ ] **Step 8: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add backend/app/domains backend/alembic/versions/0007_ucca_chart_audits.py backend/tests/test_ucca_models.py
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca): chart audit schema — header table, linked results, findings, cycle year/quarter
+git -C <repo> add backend/app/domains backend/alembic/versions/0007_ucca_chart_audits.py backend/tests/test_ucca_models.py
+git -C <repo> commit -m "feat(ucca): chart audit schema — header table, linked results, findings, cycle year/quarter
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -1300,8 +1300,8 @@ Expected: todo verde (ajustar el orden de `scalar_results` en `test_submit_then_
 - [ ] **Step 7: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add backend/app/domains/governance/ucca backend/tests/test_ucca_chart_audits.py
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca): chart audit API — create/edit/submit/approve with score, outcome and findings
+git -C <repo> add backend/app/domains/governance/ucca backend/tests/test_ucca_chart_audits.py
+git -C <repo> commit -m "feat(ucca): chart audit API — create/edit/submit/approve with score, outcome and findings
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -1528,8 +1528,8 @@ Expected: todo verde.
 - [ ] **Step 7: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add backend/app/domains/governance/ucca backend/tests/test_ucca_cycles_create.py
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca): cycles by facility + year + quarter with audit counts
+git -C <repo> add backend/app/domains/governance/ucca backend/tests/test_ucca_cycles_create.py
+git -C <repo> commit -m "feat(ucca): cycles by facility + year + quarter with audit counts
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -1946,8 +1946,8 @@ def test_dashboard_endpoint_empty(monkeypatch):
 Run: `cd backend && ./.venv/bin/python -m pytest -q` → todo verde.
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add backend/app/domains/governance/ucca backend/tests/test_ucca_summary.py
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca): cycle summary and dashboard aggregates
+git -C <repo> add backend/app/domains/governance/ucca backend/tests/test_ucca_summary.py
+git -C <repo> commit -m "feat(ucca): cycle summary and dashboard aggregates
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -2492,14 +2492,14 @@ Borrar `UccaDashboard.tsx` y `UccaEvaluatePage.tsx` (`git rm`).
 
 - [ ] **Step 8: Build y verificación rápida**
 
-Run: `npm --prefix /Users/danielsandoval/Documents/Proyectos/clinical-governance/frontend run build` → `✓ built`.
+Run: `npm --prefix <repo>/frontend run build` → `✓ built`.
 Con los servicios arriba, abrir `http://localhost:5173/ucca` con Playwright: crear ciclo "Al Falah · 2026 · Q2" → fila nueva; repetir → mensaje 409 en el drawer.
 
 - [ ] **Step 9: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add -A frontend/src
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca-ui): cycles page with new-cycle drawer, shared types, client scoring, routes and i18n
+git -C <repo> add -A frontend/src
+git -C <repo> commit -m "feat(ucca-ui): cycles page with new-cycle drawer, shared types, client scoring, routes and i18n
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -2668,14 +2668,14 @@ export function UccaCyclePage() {
 
 - [ ] **Step 3: Build + verificación visual**
 
-Run: `npm --prefix /Users/danielsandoval/Documents/Proyectos/clinical-governance/frontend run build` → `✓ built`.
+Run: `npm --prefix <repo>/frontend run build` → `✓ built`.
 Playwright a 1280px en `/ucca/cycles/<id>`: `document.documentElement.scrollWidth === window.innerWidth`; KPIs con "—" si no hay auditorías; tabla vacía con mensaje.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add frontend/src/modules/ucca
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca-ui): cycle page with KPIs and Excel-style chart audit table
+git -C <repo> add frontend/src/modules/ucca
+git -C <repo> commit -m "feat(ucca-ui): cycle page with KPIs and Excel-style chart audit table
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -3127,14 +3127,14 @@ Nota: `GET /identity/users` devuelve `status`; `GET /identity/professionals` dev
 
 - [ ] **Step 7: Build + verificación con Playwright**
 
-Run: `npm --prefix /Users/danielsandoval/Documents/Proyectos/clinical-governance/frontend run build` → `✓ built`.
+Run: `npm --prefix <repo>/frontend run build` → `✓ built`.
 Flujo en `http://localhost:5173/ucca/cycles/<id>/audits/new`: elegir profesional (CG_ID y profesión se rellenan), MRN `102453`, marcar 5 Yes + 1 N/A (con razón) + 1 No → barra muestra `6/7 … 5 … 83.33 % … Minor Improvement`; sección de hallazgo aparece; guardar sin hallazgo → mensaje de validación; con hallazgo + acción (responsable, fecha) → redirige a `/ucca/audits/<id>` con estado Borrador; **Enviar** → Enviado y campos deshabilitados; **Aprobar** → Aprobado. Volver al ciclo: fila con chips ✓/✗/N/A, score y outcome. Confirmar sin scroll horizontal.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add frontend/src
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca-ui): chart audit form — criterion cards, live score bar, finding and corrective action
+git -C <repo> add frontend/src
+git -C <repo> commit -m "feat(ucca-ui): chart audit form — criterion cards, live score bar, finding and corrective action
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -3325,14 +3325,14 @@ export function UccaAnalyticsPage() {
 
 - [ ] **Step 3: Build + verificación**
 
-Run: `npm --prefix /Users/danielsandoval/Documents/Proyectos/clinical-governance/frontend run build` → `✓ built`.
+Run: `npm --prefix <repo>/frontend run build` → `✓ built`.
 Playwright en `/ucca/dashboard`: con la auditoría aprobada de Task 8, KPIs > 0, barras por criterio, fila del profesional con outcome, acción abierta listada; filtro trimestre distinto → mensaje vacío; sin scroll horizontal a 1280px.
 
 - [ ] **Step 4: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add frontend/src/modules/ucca
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "feat(ucca-ui): dashboard with filters, criterion rates, practitioner table and open actions
+git -C <repo> add frontend/src/modules/ucca
+git -C <repo> commit -m "feat(ucca-ui): dashboard with filters, criterion rates, practitioner table and open actions
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
@@ -3447,8 +3447,8 @@ Crear `docs/AEGIS_M04_UCCA_Chart_Audit.md` con: objetivo (1 párrafo), flujo del
 - [ ] **Step 5: Commit**
 
 ```bash
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance add -A
-git -C /Users/danielsandoval/Documents/Proyectos/clinical-governance commit -m "docs(ucca): demo chart audits, README section, M04 guide, graph refresh
+git -C <repo> add -A
+git -C <repo> commit -m "docs(ucca): demo chart audits, README section, M04 guide, graph refresh
 
 Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>"
 ```
