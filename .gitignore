@@ -13,3 +13,4 @@ graphify-out/cache/
 .vercel
 .env.local
 .env*.local
+.env*

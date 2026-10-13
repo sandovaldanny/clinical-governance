@@ -1,6 +1,5 @@
 backend/.venv
 backend/tests
-backend/alembic
 **/node_modules
 **/__pycache__
 graphify-out
