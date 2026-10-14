@@ -1,11 +1,11 @@
-backend/.venv
-backend/tests
+/backend/.venv
+/backend/tests
 **/node_modules
 **/__pycache__
-graphify-out
-docs
-branding
-infra
+/graphify-out
+/docs
+/branding
+/infra
 .playwright-mcp
 .superpowers
 .env
