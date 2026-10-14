@@ -130,13 +130,14 @@ del seed y la UI muestra una franja de advertencia. **Nunca** habilitar en stagi
 
 ## Navegación
 
-Barra lateral con tres grupos plegables (preferencia guardada en `localStorage`, clave `aegis.sidebar.open`):
+Barra lateral con cuatro grupos plegables (preferencia guardada en `localStorage`, clave `aegis.sidebar.open`):
 
 | Grupo | Pantallas |
 |---|---|
 | Administración | Usuarios · Cargos · Centros médicos · Profesiones · Especialidades · Criterios de evaluación · Roles AEGIS |
-| Gobierno clínico | UCCA (ciclos → ciclo → auditar expediente) · AEGIS (módulo en construcción) · Indicadores a evaluar (catálogos M05) · Guías (línea base contra el Clinical Governance Framework: cumple / parcial / planificado / brecha por dominio, con pendientes y recomendaciones; fuente `docs/Clinical Governance Framework.docx`) |
+| Gobierno clínico | UCCA (ciclos → ciclo → auditar expediente) · AEGIS (módulo en construcción) |
 | Dashboard | UCCA (`/ucca/dashboard`) |
+| Documentación | Indicadores a evaluar (catálogos M05) · Guías (línea base contra el Clinical Governance Framework: cumple / parcial / planificado / brecha por dominio, con pendientes y recomendaciones; fuente `docs/Clinical Governance Framework.docx`) |
 
 Cabecera: selector ES/EN y menú de perfil del usuario autenticado. La franja ámbar superior solo aparece con
 `VITE_AUTH_DISABLED=true`.

@@ -1,4 +1,4 @@
-/** Navegación: Administración primero, luego Gobierno clínico y Dashboard. Etiquetas vía i18n. */
+/** Navegación: Administración, Gobierno clínico, Dashboard y Documentación. Etiquetas vía i18n. */
 
 export type NavItem = {
   labelKey: string;
@@ -28,12 +28,17 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { labelKey: "nav.uccaCycles", path: "/ucca" },
       { labelKey: "nav.aegis", path: "/aegis" },
-      { labelKey: "nav.indicators", path: "/indicators" },
-      { labelKey: "nav.guides", path: "/guides" },
     ],
   },
   {
     titleKey: "nav.dashboard",
     items: [{ labelKey: "nav.uccaDashboard", path: "/ucca/dashboard" }],
+  },
+  {
+    titleKey: "nav.documentation",
+    items: [
+      { labelKey: "nav.indicators", path: "/indicators" },
+      { labelKey: "nav.guides", path: "/guides" },
+    ],
   },
 ];

@@ -51,7 +51,8 @@
     "aegis": "AEGIS",
     "guides": "Guides",
     "dashboard": "Dashboard",
-    "uccaDashboard": "UCCA"
+    "uccaDashboard": "UCCA",
+    "documentation": "Documentation"
   },
   "login": {
     "welcome": "Welcome",
