@@ -12,6 +12,7 @@ import { ProfessionsPage } from "./modules/admin/ProfessionsPage";
 import { RolesPage } from "./modules/admin/RolesPage";
 import { SpecialtiesPage } from "./modules/admin/SpecialtiesPage";
 import { UsersPage } from "./modules/admin/UsersPage";
+import { GuidesPage } from "./modules/guides/GuidesPage";
 import { IndicatorsPage } from "./modules/indicators/IndicatorsPage";
 import { ChartAuditPage } from "./modules/ucca/ChartAuditPage";
 import { UccaAnalyticsPage } from "./modules/ucca/UccaAnalyticsPage";
@@ -34,6 +35,7 @@ export function App() {
         <Route path="/ucca/audits/:auditId" element={<ChartAuditPage />} />
         <Route path="/indicators" element={<IndicatorsPage />} />
         <Route path="/aegis" element={<AegisPage />} />
+        <Route path="/guides" element={<GuidesPage />} />
         <Route path="/admin/users" element={<UsersPage />} />
         <Route path="/admin/positions" element={<PositionsPage />} />
         <Route path="/admin/facilities" element={<FacilitiesPage />} />

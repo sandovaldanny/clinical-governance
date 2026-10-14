@@ -135,7 +135,7 @@ Barra lateral con tres grupos plegables (preferencia guardada en `localStorage`,
 | Grupo | Pantallas |
 |---|---|
 | Administración | Usuarios · Cargos · Centros médicos · Profesiones · Especialidades · Criterios de evaluación · Roles AEGIS |
-| Gobierno clínico | UCCA (ciclos → ciclo → auditar expediente) · AEGIS (módulo en construcción) · Indicadores a evaluar (catálogos M05) |
+| Gobierno clínico | UCCA (ciclos → ciclo → auditar expediente) · AEGIS (módulo en construcción) · Indicadores a evaluar (catálogos M05) · Guías (línea base contra el Clinical Governance Framework: cumple / parcial / planificado / brecha por dominio, con pendientes y recomendaciones; fuente `docs/Clinical Governance Framework.docx`) |
 | Dashboard | UCCA (`/ucca/dashboard`) |
 
 Cabecera: selector ES/EN y menú de perfil del usuario autenticado. La franja ámbar superior solo aparece con

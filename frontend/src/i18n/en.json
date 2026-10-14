@@ -49,6 +49,7 @@
     "roles": "AEGIS roles",
     "positions": "Positions",
     "aegis": "AEGIS",
+    "guides": "Guides",
     "dashboard": "Dashboard",
     "uccaDashboard": "UCCA"
   },
@@ -366,5 +367,28 @@
   "aegis": {
     "title": "AEGIS",
     "subtitle": "Module under construction. Coming soon."
+  },
+  "guides": {
+    "title": "Guides",
+    "subtitle": "Clinical Governance Framework: where AEGIS already applies it, where it does not, and what is pending",
+    "columns": {
+      "domain": "Framework domain",
+      "status": "Status",
+      "applied": "Where we apply it",
+      "pending": "Pending"
+    },
+    "statuses": {
+      "compliant": "Compliant",
+      "partial": "Partial",
+      "planned": "Planned",
+      "gap": "Gap"
+    },
+    "statusHints": {
+      "compliant": "Covered by what is implemented",
+      "partial": "Partly implemented",
+      "planned": "Foreseen in the requirement (M01–M19)",
+      "gap": "No owning module"
+    },
+    "recommendations": "Recommendations"
   }
 }

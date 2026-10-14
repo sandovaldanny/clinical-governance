@@ -29,6 +29,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { labelKey: "nav.uccaCycles", path: "/ucca" },
       { labelKey: "nav.aegis", path: "/aegis" },
       { labelKey: "nav.indicators", path: "/indicators" },
+      { labelKey: "nav.guides", path: "/guides" },
     ],
   },
   {
