@@ -1,4 +1,6 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+
+import { UNAUTHORIZED_EVENT } from "../api/client";
 
 type Session = { token: string; mustChangePassword: boolean } | null;
 
@@ -36,6 +38,16 @@ function writeStoredSession(session: Session): void {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSessionState] = useState<Session>(readStoredSession);
+
+  // Token rechazado por el backend (expirado, secreto rotado): se descarta y se vuelve al login.
+  useEffect(() => {
+    const onUnauthorized = () => {
+      writeStoredSession(null);
+      setSessionState(null);
+    };
+    window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+    return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+  }, []);
 
   const value = useMemo<AuthContextValue>(() => {
     const setSession = (next: Session) => {

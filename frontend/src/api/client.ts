@@ -31,7 +31,10 @@ export async function login(identifier: string, password: string): Promise<Login
   return response.json();
 }
 
-export function apiFetch(path: string, init: RequestInit = {}, token?: string) {
+/** Evento global: el backend rechazó un token (expirado o firmado con otro secreto). AuthProvider lo escucha y cierra la sesión. */
+export const UNAUTHORIZED_EVENT = "aegis:unauthorized";
+
+export async function apiFetch(path: string, init: RequestInit = {}, token?: string) {
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(init.headers as Record<string, string> | undefined),
@@ -39,7 +42,11 @@ export function apiFetch(path: string, init: RequestInit = {}, token?: string) {
   if (!AUTH_DISABLED && token) {
     headers.Authorization = `Bearer ${token}`;
   }
-  return fetch(`${API_BASE}${path}`, { ...init, headers });
+  const response = await fetch(`${API_BASE}${path}`, { ...init, headers });
+  if (response.status === 401 && token && !AUTH_DISABLED) {
+    window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+  }
+  return response;
 }
 
 export async function apiFetchJson<T>(
